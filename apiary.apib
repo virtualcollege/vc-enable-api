@@ -1,0 +1,770 @@
+FORMAT: 1A
+
+# Enable API
+Enable API is a service for integrating with Virtual College's Enable product.
+
+# Usage
+Every request to the API must specify the following headers:
+- x-api-version: Allows the server to determine what version of the API should be used
+- x-api-nonce: Used to protect against replay attacks.  Every request must specify a nonce that is globally unique over a given period of time
+
+Requests to API functions which require the client to authenticate must also specify the following headers:
+- x-api-access-token: Used to authenticate the client and verify the source of API requests
+
+**Remarks**
+- Any request that does not specify x-api-version will return a 400
+- Any request that specifies an unexpected x-api-version will return a 404
+- Any request that does not specify x-api-nonce will return a 400
+- Any request that specifies a nonce that has been used previously will return a 401
+- Any request that requires authentication but does not specify x-api-access-token or specifies an invalid token will return a 401
+- Tokens use the JSON Web Token format (http://jwt.io)
+
+# Group Security
+
+In order to authenticate with the API a client must first request an authorisation token 
+which must then be encrypted and signed using the client's secret key.  The encrypted 
+payload must then be posted to the server to create an access token.
+
+Access Tokens are time limited and will expire.  When creating an access token the server
+will return a timestamp of when the token will expire.
+
+## Authorisation Token [/authorisation-tokens/{domainReference}]
+Endpoint to retrieve a single Authorisation Token for use in creating an Access Token
+
++ Parameters
+    + domainReference (required, Guid) ... The reference of the domain the client is trying to authenticate against
+
+### Create an Authorisation Token [GET]
++ Request (application/json)
+
+    + Header
+    
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            
++ Response 201 (application/json)
+
+            {
+                "authorisationToken": "$2a$04$o9zKYcg8Fb8QdOqzCfAh6Ora4H//BZlYcjPFdUdYpti30rzynJ7Ca"
+            }
+            
++ Response 401
+
++ Response 404
+
+## Access Tokens [/access-tokens]
+Access tokens used to authenticate a client with the API
+
+### Create an Access Token [POST]
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+    
+    + Body
+
+            {
+                "domainReference": "81cd217b-177e-43e2-94fd-eac424780a4f",   
+                "signedAuthorisationToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts" 
+            }
+
++ Response 201 (application/json)
+
+        { 
+            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts", 
+            "tokenExpiry": "2014-11-12T14:34:19.312Z" 
+        }
+
++ Response 401
+
++ Response 404
+
+# Group Learn
+
+## Modules [/learn/modules/search]
+
+List modules that can be shown in a shop.
+
+This will include all modules available to the API's 
+LMS (including self-created modules and licenced modules).
+Includes a free-text search that filters the list of modules.
+
+The parameters are -
++ `search` *(optional)* A free-text search that filters the list of modules based on the name of the module (case insensitive).
++ `pageSize` *(optional, defaults to 12)* The number of items to return for a page
++ `pageNumber` *(optional, defaults to 1)* The requested page.  This number is 1-based (such as the first page is `pageNumber: 1`)
++ `order` *(optional, defaults to AlphaAscending)* The order of the modules.  The available options are -
+    + AlphaAscending
+    + AlphaDescending
+    + DateAscending
+    + DateDescending
+
+Returned properties are -
++ `totalModules` The total number of modules that match the current request, across all pages.  This is an **INT**
++ `modules` An array of modules
++ `modules\moduleReference` The reference of the module.  This is the reference that should be used when informing the LMS of any purchases.  This is a **GUID**
++ `modules\name` This is the name of the module, in English
++ `modules\description` This is the description of the module, in English
++ `modules\publishDate` This is the date and time at which the module was last published.  This date is **UTC**, according to **ISO 8601**.
++ `modules\isPosted` This is whether the module has a posted certificate.  Where an LMS is licenced a posted and non-posted version of the module, the module will appear twice in the list.  This is a **BOOL**
+
+No results will return `totalModules: 0` and an empty array.
+
+### Retrieve modules [POST]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            { 
+                "search": "module1", 
+                "pageSize": 24,
+                "pageNumber": 1,
+                "order": "DateDescending"
+            }
+    
++ Response 200 (application/json)
+
+        { 
+            "totalModules": 123, 
+            "modules": 
+            [
+                {
+                    "moduleReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "name": "Module1",
+                    "description": "This is module 1",
+                    "publishDate": "2012-04-23T18:25:43.511Z",
+                    "isPosted": false
+                },
+                {
+                    "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "name": "Module2",
+                    "description": "This is module 2",
+                    "publishDate": "2012-04-23T18:25:43.511Z",
+                    "isPosted": false
+                },
+                {
+                    "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "name": "Module2",
+                    "description": "This is module 2",
+                    "publishDate": "2012-04-23T18:25:43.511Z",
+                    "isPosted": true
+                }
+            ]
+        }
+
++ Response 401
+
++ Response 404
+
+# Group Shop
+
+## Purchases [/shop/purchases]
+Records a purchase of modules made by a user outside of the LMS.
+The modules purchased will be attributed to the specified user.
+
+The parameters are -
++ `emailAddress` *(Required)* The email address of the user to whom the purchase is to be attributed
++ `orderNumber` *(Required)* The order number of the purchase.  Can be alpha-numeric, maximum 50 characters
++ `orderDate` *(Required)* The date of the order.  Must be in the **ISO 8601** format
++ `totalAmount` *(Required)* The grand total of the order, including VAT and after any discounts have been applied.  Must be in the currency specified in `currencyCode`, and be a valid currency value
++ `currencyCode` *(Required)* The currency of the totals used in the order.  The code should be a valid **ISO 4217** code.
++ `vatAmount` *(Required)* The total VAT charged for the order.  Must be in the currency specified in `currencyCode`, and be a valid currency value
++ `discountAmount` *(Optional, defaults to 0)* The total amount discounted form the order.  Must be in the currency specified in `currencyCode`, and be a valid currency value
++ `products` *(Required)* The list of products included in the order.  Must contain at least one item
++ `product\name` *(Required)* The name of the product.  Can be alpha-numeric, maximum 255 characters
++ `product\id` *(Required)* The id of the product, as defined by the calling application.  Can be alpha-numberic, maximum 255 characters
++ `product\unitPrice` *(Required)* The price for a purchase of the product with a quantity of 1, before VAT and before any discounts applied.  Must be in the currency specified in `currencyCode`, and be a valid currency value
++ `product\quantity` *(Required)* The quantity of the product in the order.  Must be an **INT**
++ `product\modules` *(Required)* The modules associated with the product.  Must contain at least one item
++ `product\module\moduleReference` *(Required)* The reference of the module.  This is the reference provided by the LMS via the API.  Must be a **GUID**
++ `product\module\quantity` *(Optional, defaults to 1)* The number of modules included in the product.  If no quantity is provided, a default of **1** is used.  Must be an **INT**
++ `product\module\isPosted` *(Optional, defaults to false)* Whether the product should be posted.  Must be a **BOOL**
+
+Returns `201` if the operation was successful, otherwise one of the error codes is returned.  Also returns the URL to which
+the user should be directed.  If the user has been created as part of this call, then this link redirects to the confirmation page
+that the user will complete to confirm their account.
+
+### Add purchases [POST]
+
++ Request (application/json)
+    + Header
+    
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            { 
+                "emailAddress": "darren.lawson@virtual-college.co.uk", 
+                "orderNumber": "abc123",
+                "orderDate": "2012-04-23T18:25:43.511Z",
+                "totalAmount": 190.12,
+                "currencyCode": "GBP",
+                "vatAmount": 40.00,
+                "discountAmount": 12.34,
+                "products": 
+                [
+                    {
+                        "name": "Product1",
+                        "id": "abc123",
+                        "unitPrice": 12.34,
+                        "quantity": 1,
+                        "modules":
+                        [
+                            {
+                                "moduleReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                                "quantity": 3,
+                                "isPosted": true
+                            },
+                            {
+                                "moduleReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                                "quantity": 2,
+                                "isPosted": false
+                            },
+                            {
+                                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                                "quantity": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Product2",
+                        "id": "def456",
+                        "unitPrice": 34.21,
+                        "quantity": 1,
+                        "modules":
+                        [
+                            {
+                                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                                "quantity": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+
++ Response 201
+
+        https://www.vc-enable.co.uk
+
++ Response 400
+
+        The request is badly formed, or is missing something required
+
++ Response 401
+
++ Response 404
+
+# Group Users
+User related resources of the **Enable API**
+
+## Find Users [/users/search]
+Gets a list of users.
+
+The parameters are -
++ `search` *(optional)* A free-text search that filters the list of users based on the first name, last name and email address of the user (case insensitive).
++ `pageSize` *(optional, defaults to 12)* The number of items to return for a page
++ `pageNumber` *(optional, defaults to 1)* The requested page.  This number is 1-based (such as the first page is `pageNumber: 1`)
++ `order` *(optional, defaults to AlphaAscending)* The order of the users.  The available options are -
+    + AlphaAscending
+    + AlphaDescending
+    + DateAscending
+    + DateDescending
+
+Returned properties are -
++ `totalUsers` The total number of users that match the current request, across all pages.  This is an **INT**
++ `users` An array of users
++ `users\reference` The reference of the user within an LMS.  This is a **GUID**
++ `users\firstName` This is the first name of the user
++ `users\lastName` This is the last name of the user
++ `users\emailAddress` This is the email address of the user
++ `users\createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
++ `users\additional` An array of additional properties, including optional fields
++ `users\additional\name` The name of the property, in English
++ `users\additional\value` The value of the property.  The type will be dependent on the type of the field itself
+
+No results will return `totalUsers: 0` and an empty array.
+
+### Search [POST]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            { 
+                "search": "user1", 
+                "pageSize": 24,
+                "pageNumber": 1,
+                "order": "DateDescending"
+            }
+    
++ Response 200 (application/json)
+
+        { 
+            "totalUsers": 123, 
+            "users": 
+            [
+                {
+                    "reference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "firstName": "Jamie",
+                    "lastName": "Burns",
+                    "emailAddress": "jamie.burns@virtual-college.co.uk",
+                    "createdDate": "2012-04-23T18:25:43.511Z",
+                    "additional":
+                    [
+                        {
+                            "name": "jobTitle",
+                            "value": "Software Architect"
+                        },
+                        {
+                            "name": "userStartDate",
+                            "value": "01-Jan-2016"
+                        }
+                    ]
+                },
+                {
+                    "reference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "firstName": "Alex",
+                    "lastName": "Woodhead",
+                    "emailAddress": "alex.woodhead@virtual-college.co.uk",
+                    "createdDate": "2013-04-23T18:25:43.511Z",
+                    "additional": []
+                }
+            ]
+        }
+
++ Response 401
+
++ Response 404
+
+## Manage User Details [/users/{emailAddress}]
+Gets or updates the details of a specific user.
+
+The parameters are -
++ `emailAddress` *(required)* The exact email address to search by (case insensitive).  This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
+
+Returned properties are -
++ `reference` The reference of the user within an LMS.  This is a **GUID**
++ `firstName` This is the first name of the user
++ `lastName` This is the last name of the user
++ `emailAddress` This is the email address of the user
++ `createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
++ `additional` An array of additional properties, including optional fields
++ `additional\name` The name of the property, in English
++ `additional\value` The value of the property.  The type will be dependent on the type of the field itself
+
+When updating, only the following properties can be changed -
++ `firstName` *(required)* This can be freely changed. Maximum 255 characters
++ `lastName` *(required)* This can be freely changed. Maximum 255 characters
++ `emailAddress` *(required)* This can only be changed if the user does not exist in other LMSs, and if the user has not logged in. Maximum 255 characters
++ `additional` *(optional)* An array of additional properties, including optional fields.  Any fields not provided in the list will remain unchanged when persisted
++ `additional\name` *(required)* The name of the property, in English
++ `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
+
+### Find [GET]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            "reference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+            "firstName": "Jamie",
+            "lastName": "Burns",
+            "emailAddress": "jamie.burns@virtual-college.co.uk",
+            "createdDate": "2012-04-23T18:25:43.511Z",
+            "additional":
+            [
+                {
+                    "name": "jobTitle",
+                    "value": "Software Architect"
+                },
+                {
+                    "name": "userStartDate",
+                    "value": "01-Jan-2016"
+                }
+            ]
+        }
+
++ Response 401
+
++ Response 404
+
+### Update [PUT]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            { 
+                "firstName": "Jamie",
+                "lastName": "Burns",
+                "emailAddress": "jamie.burns@virtual-college.co.uk",
+                "additional":
+                [
+                    {
+                        "name": "jobTitle",
+                        "value": "Software Architect"
+                    }
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "userInstanceAccountReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+            "firstName": "Jamie",
+            "lastName": "Burns",
+            "emailAddress": "jamie.burns@virtual-college.co.uk",
+            "createdDate": "2012-04-23T18:25:43.511Z",
+            "additional":
+            [
+                {
+                    "name": "jobTitle",
+                    "value": "Software Architect"
+                },
+                {
+                    "name": "userStartDate",
+                    "value": "01-Jan-2016"
+                }
+            ]
+        }
+
++ Response 401
+
+        {
+            "Error description 1",
+            "Error description 2"
+        }
+
++ Response 404
+
+### Delete [DELETE]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
++ Response 401
+
++ Response 404
+
+## Create User [/users/]
+Creates a new user
+
+The parameters are -
++ `emailAddress` *(required)* The user's email address. Maximum 255 characters, and must be of a valid email address format
++ `firstName` *(required)* The user's first name. Maximum 255 characters
++ `lastName` *(required)* This user's last name. Maximum 255 characters
++ `additional` *(optional)* An array of additional properties, including optional fields
++ `additional\name` *(required)* The name of the property, in English
++ `additional\value` *(optional)* The value of the property. Maximum 255 characters.  The type will be dependent on the type of the field itself
+
+Returned properties are -
++ `reference` The reference of the user within an LMS.  This is a **GUID**
++ `firstName` This is the first name of the user
++ `lastName` This is the last name of the user
++ `emailAddress` This is the email address of the user
++ `createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
++ `additional\name` *(required)* The name of the property, in English
++ `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
+
+
+### Add [POST]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            { 
+                "firstName": "Jamie",
+                "lastName": "Burns",
+                "emailAddress": "jamie.burns@virtual-college.co.uk",
+                "additional":
+                [
+                    {
+                        "name": "jobTitle",
+                        "value": "Software Architect"
+                    },
+                    {
+                        "name": "userStartDate",
+                        "value": "01-Jan-2016"
+                    }
+                ]
+            }
+            
++ Response 201 (application/json)
+
+        {
+            "reference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+            "firstName": "Jamie",
+            "lastName": "Burns",
+            "emailAddress": "jamie.burns@virtual-college.co.uk",
+            "createdDate": "2012-04-23T18:25:43.511Z",
+            "additional":
+            [
+                {
+                    "name": "jobTitle",
+                    "value": "Software Architect"
+                },
+                {
+                    "name": "userStartDate",
+                    "value": "01-Jan-2016"
+                }
+            ]
+        }
+
++ Response 401
+
+        {
+            "Error description 1",
+            "Error description 2"
+        }
+
++ Response 404
+
++ Response 409
+
+        {
+            "User with the same email address already exists within the domain."
+        }
+
+## Optional Fields [/users/optionalFields]
+Gets the list of available optional fields
+
+Returned properties are -
++ `name` The name of the optional field, in English
++ `type` The descriptive type of the optional field
+
+The types available are -
++ `String` A string
++ `Number` A number
++ `Date` A date
++ `PassedDate` A date in the past
++ `PositiveNumber` A positive number
++ `NonLocalisedPassedDate` A date without time, which is in the past
++ `NonLocalisedDate` A date without time
+
+### List [GET]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        [
+            {
+                "name": "DateOfBirth",
+                "type": "Unlocalised date in the past",
+            },
+            {
+                "name": "JobTitle",
+                "type": "Text",
+            }
+        ]
+
++ Response 401
+
++ Response 404
+
+## Synchronise Users [/users/SSO]
+Synchronises users from an external source into the LMS.
+
+Accepts an array of user objects.  The "id" property is used to identify the user.
+
+### Import users [POST]
+
+The parameters are -
++ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID
++ `firstName` *(required)* The first name of the user.  Maximum 255 characters
++ `lastName` *(required)* The last name of the user.  Maximum 255 characters
++ `emailAddress` *(required)* The email address of the user.  Maximum 255 characters
++ `accountName` *(optional)* The account name of the user.  For AD FS SSO, this should be the SamAccountName.  Maximum 255 characters
+
+If the user does not already exist, it is added.  If they already exist, they are updated.
+  
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+
+            {
+                "users":
+                [
+                    {
+                        "id": "S-1-5-21-2527162006-4105834857-2401098550-2613",
+                        "firstName": "Jamie",
+                        "lastName": "Burns",
+                        "emailAddress": "jamie.burns@virtual-college.co.uk",
+                        "accountName": "jamie.burns"
+                    },
+                    {
+                        "id": "S-2-6-21-2527162006-4105834857-2401098550-2614",
+                        "firstName": "Alex",
+                        "lastName": "Woodhead",
+                        "emailAddress": "alex.woodhead@virtual-college.co.uk",
+                        "accountName": "alex.woodhead"
+                    }
+                ]
+            }
+                
++ Response 200
+
++ Response 400
+
+        The request is badly formed, or is missing something required
+
++ Response 401
+
++ Response 404
+
+## Delete Users [/users/SSO/delete]
+Deletes SSO users from the LMS.
+
+### Delete users [POST]
+
+The parameters are -
++ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID
+
+ Deletes the specified users.  Accepts a list of ids to identify users.
+ 
+ If a user is not found for a specific id, then that id is ignored.  No error will be returned for it.
+  
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            [
+                {
+                    "id": "S-1-5-21-2527162006-4105834857-2401098550-2613"
+                },
+                {
+                    "id": "S-2-6-21-2527162006-4105834857-2401098550-2614"
+                }
+            ]
+        
++ Response 200
+
++ Response 400
+
+        The request is badly formed, or is missing something required
+
++ Response 401
+
++ Response 404
+
+## Count Users - Current Day [/users/recentCount]
+A count of the number of users added, and who have logged in, since midnight (UTC).
+
+Users who exist in multiple LMSs are counted only once.
+
+### Retrieve recent count [GET]
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        { 
+            123
+        }
+        
++ Response 401
+
++ Response 404
+
+## Count Users - Total [/users/count]
+A count of the number of users added, and who have logged in, in total.
+
+Users who exist in multiple LMSs are counted only once.
+
+### Retrieve total count [GET]
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        { 
+            1234
+        }
+        
++ Response 401
+
++ Response 404
