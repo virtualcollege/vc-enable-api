@@ -635,7 +635,7 @@ The parameters are -
 + `lastName` *(required)* The last name of the user.  Maximum 255 characters
 + `emailAddress` *(required)* The email address of the user.  Maximum 255 characters
 + `accountName` *(optional)* The account name of the user.  For AD FS SSO, this should be the SamAccountName.  Maximum 255 characters
-+ `groupReferences` *(optional)* An array of Groups to add the user to
++ `groupReferences` *(optional)* An array of Groups to add the user to. Users are only added to groups via this call, not removed.
 
 If the user does not already exist, it is added.  If they already exist, they are updated.
   
