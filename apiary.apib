@@ -501,6 +501,7 @@ The parameters are -
 + `additional` *(optional)* An array of additional properties, including optional fields
 + `additional\name` *(required)* The name of the property, in English
 + `additional\value` *(optional)* The value of the property. Maximum 255 characters.  The type will be dependent on the type of the field itself
++ `groupReferences` *(optional)* An array of Groups (GUIDs) to add the user to. Users are only added to groups via this call, not removed.
 
 Returned properties are -
 + `reference` The reference of the user within an LMS.  This is a **GUID**
@@ -510,7 +511,6 @@ Returned properties are -
 + `createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
 + `additional\name` *(required)* The name of the property, in English
 + `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
-+ `groupReferences` *(optional)* An array of Groups (GUIDs) to add the user to. Users are only added to groups via this call, not removed.
 
 
 ### Add [POST]
