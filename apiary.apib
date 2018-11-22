@@ -168,6 +168,96 @@ No results will return `totalModules: 0` and an empty array.
 
 + Response 404
 
+## UserHasAllocation [/learn/modules/userHasAllocation]
+Check if the user has the module allocated in shop domain.
+
+The parameters are -
++ `emailAddress` Email Address of the user that needs to be checked
++ `moduleReference` The reference of the module.
++ `isPosted`: This is whether the module has a posted certificate. 
+
+Returned properties are -
++ `allocationUrl` This is empty if the user doesn't exist or hasn't got the allocation. Otherwise returns the url to the module overview page.
++ `hasAllocation` A boolean value to denote if the user has allocation or not.
+
+
+### Check user has allocation [POST]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            { 
+                "emailAddress": "xyz@vc.com", 
+                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                "isPosted": false
+            }
+    
++ Response 200 (application/json)
+
+        {
+        "allocationUrl": "https://bedrock-web.devmachine.com/Learn/Learning/LearnerRecord?reference=398e9d7b-e1c7-4ce7-aff8-f6dfcbf45f30",
+        "hasAllocation": true
+        }
+        
++ Response 400
+
+        [
+            "Error description 1",
+            "Error description 2"
+        ]
+
+
+## Allocate To User [/learn/modules/allocateToUser]
+Creates user if doesn't exist and allocates the module irrespective of whether the user already has one or not.
+
+The parameters are -
++ `emailAddress` Email Address of the user that needs to be checked
++ `moduleReference` The reference of the module.
++ `isPosted`: This is whether the module has a posted certificate. 
+
+Returned properties are -
++ `allocationUrl` Returns the url to take the user to the module overview page.
+
+### Allocate module to user [POST]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            { 
+                "emailAddress": "xyz@vc.com", 
+                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                "isPosted": false
+            }
+    
++ Response 200 (application/json)
+
+        {
+        "allocationUrl": "https://bedrock-web.devmachine.com/Learn/Learning/LearnerRecord?reference=398e9d7b-e1c7-4ce7-aff8-f6dfcbf45f30"
+        }
+        
++ Response 400
+
+        [
+            "Error description 1",
+            "Error description 2"
+        ]
+
 # Group Shop
 
 ## Purchases [/shop/purchases]
