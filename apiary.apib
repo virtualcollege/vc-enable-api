@@ -773,6 +773,51 @@ If the user does not already exist, it is added.  If they already exist, they ar
 
 + Response 404
 
+## Activate Users [/users/SSO/activate]
+Sets SSO users from the LMS as active.
+
+### Activate Users [POST]
+
+The parameters are -
+
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
+
+Activates the specified users. Accepts a list of ids to identify users.
+
+If a user is not found for a specific id, then an error will be returned including the id that was not found.
+
++ Request (application/json)
+
+    + Header
+    
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                "ids": 
+                [
+                    "S-1-5-21-2527162006-4105834857-2401098550-2613",
+                    "S-1-5-21-2527162006-4105834857-2401098550-2614"
+                ]
+            }
+            
++ Response 200
+
++ Response 400 (application/json)
+
+            [
+                Cannot find user: S-1-5-21-2527162006-4105834857-2401098550-2614,
+                Cannot find user: S-1-5-21-2527162006-4105834857-2401098550-2613,
+            ]
+
++ Response 401
+
++ Response 404
+
 ## Delete Users [/users/SSO/delete]
 Deletes SSO users from the LMS.
 
@@ -813,6 +858,59 @@ The parameters are -
 + Response 401
 
 + Response 404
+
+## Remove User From Groups [/users/sso/{id}/removeGroups]
+
+Removes a user from a list of groups.
+
+### Remove User From Group [POST]
+
+The parameters are -
++ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID
++ `references` *(required)* An array of references for each group the user is intended to be removed from
+
+ Removes the specified user from the groups. Accepts a list of references to identify the groups and an id for the target user.
+ 
+ If the user id is not found an error will be returned.
+ 
+ If a group is not found for a specific reference, then that reference will be returned in an error.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                "references": 
+                [
+                    "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d"
+                ]
+            }
+            
++ Response 200
+
++ Response 400
+
+        [
+            "Cannot find group: e9f2b0a5-01fd-4138-9451-e25ddaa70a7d"
+        ]
+        
+        OR
+        
+        [
+            "Cannot find user: S-1-5-21-2527162006-4105834857-2401098550-2613"
+        ]
+
++ Response 401
+
++ Response 404        
 
 ## Count Users - Current Day [/users/recentCount]
 A count of the number of users added, and who have logged in, since midnight (UTC).
@@ -928,3 +1026,50 @@ No results will return `totalGroups: 0` and an empty array.
 + Response 401
 
 + Response 404
+
+## Remove Users From Group [/groups/{groupReference}/sso/removeusers]
+
+Removes a list of users from a group.
+
+### Remove Users From Group [POST]
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group.
++ `Ids` *(required)* An array of id's for each user intended to be removed from the group. For AD FS SSO, this should be the SID
+
+ Removes the specified users from the group. Accepts a list of id's to identify the users and a reference for the target group.
+ 
+ If the group reference is not a valid reference, an error will be returned.
+ 
+ If a user is not found for a specific id, then that id will be returned in an error.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                ids:
+                [
+                    "S-1-5-21-2527162006-4105834857-2401098550-2613",
+                    "S-1-5-21-2527162006-4105834857-2401098550-2614"
+                ]
+            }
+            
++ Response 200
+
++ Response 400
+
+        [
+            "Cannot find user: S-1-5-21-2527162006-4105834857-2401098550-2613"
+        ]
+
++ Response 401
+
++ Response 404        
