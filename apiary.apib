@@ -1399,11 +1399,11 @@ The available columns are -
 | `UserName`                               | The username of the user                                                    | Only available for domains using SSO      |
 | `EmailAddress`                           | The email address of the user                                               |                                           |
 | `HasLoggedIn`                            | Whether the user has logged in, as a boolean                                |                                           |
-| `FirstLogin`                             | The date when the user first logged in, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                  |                                           |
-| `LastLogin`                              | The date when the user last logged in, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                   |                                           |
+| `FirstLogin`                             | The date when the user first logged in, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)                  |                                           |
+| `LastLogin`                              | The date when the user last logged in, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)                   |                                           |
 | `LearnTimeTakenTotalSeconds`             | The total time taken (in seconds) the user has spent in learning            | Requires the LearnAllocation feature      |
-| `UserCreatedDate`                        | The date when the user was first added, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                  |                                           |
-| `UserInactiveDate`                       | The date when the user was made inactive, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                |                                           |
+| `UserCreatedDate`                        | The date when the user was first added, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)                  |                                           |
+| `UserInactiveDate`                       | The date when the user was made inactive, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)                |                                           |
 | `IsInactive`                             | Whether the user is inactive, as a boolean                                  |                                           |
 | `IsPendingInvite`                        | Whether the user is in a pending state, awaiting confirmation, as a boolean |                                           |
 | `LearnAllocationsNotStartedTotal`        | The total number of learning allocations not started                        | Requires the LearnAllocation feature      |
@@ -1801,13 +1801,13 @@ The available columns are -
 | `LastName`                                 | The last name of the user                                                                                        |                                           |Text
 | `Username`                                 | The username of the user                                                                                         | Only available for domains using SSO      |Text
 | `EmailAddress`                             | The email address of the user                                                                                    |                                           |Text
-| `UserCreatedDate`                          | The date when the user was first added, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                 |                                           |Date
-| `UserInactiveDate`                         | The date when the user was made inactive, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)               |                                           |Date
+| `UserCreatedDate`                          | The date when the user was first added, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)                 |                                           |Date
+| `UserInactiveDate`                         | The date when the user was made inactive, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)               |                                           |Date
 | `IsInactive`                               | Whether the user is inactive, as a boolean                                                                       |                                           |Boolean
-| `AllocatedDate`                            | The date when the allocation was created, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)               |                                           |Date
-| `StartedDate`                              | The date when the allocation was started, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)               |                                           |Date
-| `CompletedDate`                            | The date when the allocation was started, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)               |                                           |Date
-| `DeadlineDate`                             | The date of the allocation's deadline, if applicable, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)   |                                           |Date
+| `AllocatedDate`                            | The date when the allocation was created, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)               |                                           |Date
+| `StartedDate`                              | The date when the allocation was started, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)               |                                           |Date
+| `CompletedDate`                            | The date when the allocation was started, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)               |                                           |Date
+| `DeadlineDate`                             | The date of the allocation's deadline, if applicable, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)   |                                           |Date
 | `ProgressPercentage`                       | The percentage progress of the allocation                                                                        |                                           |Number
 | `ProgressName`                             | The progress state of the allocation, either NotAttempted, InProgress or Completed                               |                                           |Text
 | `IsNotStarted`                             | Whether the allocation has not been started, as a boolean                                                        |                                           |Boolean
