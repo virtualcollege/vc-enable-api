@@ -1763,7 +1763,7 @@ Deletes a report that has been created via the API.
 + Response 404
 
 ## Export [/reporting/learn/moduleAllocation/{reference}/export]
-Exports the data according to the report that has been created.
+Exports the data according to the report that has been created. Filters can be applied to any column that are requested in the report.
 
 + Parameters
     + reference (required, Guid, `a2c749f0-2aca-4d1e-8055-e354792a27f9`) ... The reference of the report to export.  This is returned from (POST) /reporting/core/users.
@@ -1773,66 +1773,93 @@ Exports the data according to the report that has been created.
 The parameters are -
 + `columns` *(required)* An array of the columns required to be exported.  This must be an **ARRAY** of **STRING**
 
++ `filterLogicOperator` *(optional)*  Options are **and** / **or**. Default value is **and**
+
++ `filters` *(optional)* An array of filters on the fields included in the **columns** parameter
+
++ `filters\columnName` *(required)* The name of the column to which the filter needs to be applied
+
++ `filters\comparisonType` *(required)* Except for **boolean** columnn type, this is required for all the other types. It can have values like **contains**, **greater than**, **between**
+
++ `filters\value`  If the comparison type is other than **between**, then this is a required field
+
++ `filters\from` If the comparison type is **between** and the datatype of the column is **number** or **date**, then this is the required field. It is the starting value in the range for which the records should be fetched
+
++ `filters\to` If the comparison type is **between** and the datatype of the column is **number** or **date**, then this is the required field. It is the utmost value in the range for which the records should be fetched
+
++ 'filters\hours` If datatype of the column is **duration**, then this field is required
+
++ `filters\minutes` If datatype of the column is **duration**, then this field is required
+
+
 The available columns are -
-| Column Name                              | Description                                                                                   | Restrictions                              |
-|:-----------------------------------------|-----------------------------------------------------------------------------------------------|-------------------------------------------|
-| `ModuleName`                               | The name of the module                                                                        |                                           |
-| `ModuleVersionNumber`                      | The version number of the module                                                              |                                           |
-| `FirstName`                                | The first name of the user                                                                    |                                           |
-| `LastName`                                 | The last name of the user                                                                     |                                           |
-| `Username`                                 | The username of the user                                                                      | Only available for domains using SSO      |
-| `EmailAddress`                             | The email address of the user                                                                 |                                           |
-| `UserCreatedDate`                          | The date when the user was first added, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                                   |                                           |
-| `UserInactiveDate`                         | The date when the user was made inactive, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                                  |                                           |
-| `IsInactive`                               | Whether the user is inactive, as a boolean                                                    |                                           |
-| `AllocatedDate`                            | The date when the allocation was created, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                                  |                                           |
-| `StartedDate`                              | The date when the allocation was started, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                                  |                                           |
-| `CompletedDate`                            | The date when the allocation was started, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                                  |                                           |
-| `DeadlineDate`                             | The date of the allocation's deadline, if applicable, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                      |                                           |
-| `ProgressPercentage`                       | The percentage progress of the allocation                                                     |                                           |
-| `ProgressName`                             | The progress state of the allocation, either NotAttempted, InProgress or Completed            |                                           |
-| `IsNotStarted`                             | Whether the allocation has not been started, as a boolean                                     |                                           |
-| `IsInProgress`                             | Whether the allocation is in progress, as a boolean                                           |                                           |
-| `IsComplete`                               | Whether the allocation is completed, as a boolean                                             |                                           |
-| `ContentStatusName`                        | The content state of the allocation, either Incomplete, Passed or Failed                      |                                           |
-| `IsIncomplete`                             | Whether the allocation is incomplete, as a boolean                                            |                                           |
-| `IsPassed`                                 | Whether the allocation is passed, as a boolean                                                |                                           |
-| `IsFailed`                                 | Whether the allocation is failed, as a boolean                                                |                                           |
-| `IsAwaitingLicence`                        | Whether the allocation is awaiting a licence, as a boolean                                    |                                           |
-| `IsOverdue`                                | Whether the allocation is overdue, as a boolean                                               |                                           |
-| `FailedAttemptsTotal`                      | The total number of failed attempts                                                           |                                           |
-| `ReallocationsTotal`                       | The total number of reallocations                                                             |                                           |
-| `TimeTakenTotalSeconds`                    | The total time taken so far in the modules, in seconds                                        |                                           |
-| `AllocationVia`                            | The source of the allocation                                                                  |                                           |
-| `AllocationMethod`                         | The method by which the allocation was created                                                |                                           |
-| `AllocatedFromGroupName`                   | The name of the group from which the allocation was created, if applicable                    |                                           |
-| `AllocatedFromLearningCollectionName`      | The name of the learning collection from which the allocation was created, if applicable      | Requires the LearningCollections feature  |
-| `AllocatedFromLearningPlanName`            | The name of the learning plan from which the allocation was created, if applicable            | Requires the LearningPlans feature        |
-| `AllocatedFromLearningChunkName`           | The name of the learning chunk from which the allocation was created, if applicable           | Requires the LearningChunks feature       |
-| `IsAllocatedFromGroup`                     | Whether the allocation was created from a group                                               |                                           |
-| `IsAllocatedFromInventory`                 | Whether the allocation was created from a user's inventory                                    | Requires the Shop feature                 |
-| `IsAllocatedFromInstance`                  | Whether the allocation was created from the domain                                            |                                           |
-| `IsAllocatedFromLearningCollection`        | Whether the allocation was created from a learning collection                                 | Requires the LearningCollections feature  |
-| `IsAllocatedFromLearningPlan`              | Whether the allocation was created from a learning plan                                       | Requires the LearningPlans feature        |
-| `IsAllocatedFromLearningChunk`             | Whether the allocation was created from a learning chunk                                      | Requires the LearningChunks feature       |
-| `IsAutomatic`                              | Whether the allocation was created automatically                                              |                                           |
-| `IsManual`                                 | Whether the allocation was created manually                                                   |                                           |
-| `IsSelfEnrol`                              | Whether the allocation was via a self-enrolment                                               |                                           |
-| `Groups`                                   | The comma separated list of groups the user is a member of                                    |                                           |
-| `Branches`                                 | The comma separated list of branches the user is a member of                                  | Requires the Branching feature            |
-| `LineManagers`                             | The comma separated list of line managers of the user                                         | Requires the LineManager feature          |
-| `TelephoneNumber`                        | The telephone number of the user                                                              | Requires the optional field to be enabled |
-| `JobTitle`                               | The job title of the user                                                                     | Requires the optional field to be enabled |
-| `EmployeeNumber`                         | The employee number of the user                                                               | Requires the optional field to be enabled |
-| `DateOfBirth`                            | The date of birth of the user, as dd-MMM-yyyy (soon to change to yyyy-MM-dd)                                                                 | Requires the optional field to be enabled |
-| `ContractedHoursPerWeek`                 | The contracted hours per week of the user                                                     | Requires the optional field to be enabled |
-| `ReportsTo`                              | The name of which the user reports                                                            | Requires the optional field to be enabled |
-| `Location`                               | The location of the user                                                                      | Requires the optional field to be enabled |
-| `Company`                                | The company of the user                                                                       | Requires the optional field to be enabled |
-| `Department`                             | The department of the user                                                                    | Requires the optional field to be enabled |
-| `ContractStatus`                         | The contract status of the user                                                               | Requires the optional field to be enabled |
-| `SecondaryEmailAddress`                  | The secondary email address of the user                                                       | Requires the optional field to be enabled |
-| `UserStartDate`                          | The start date of the user                                                                     | Requires the optional field to be enabled |
+| Column Name                                | Description                                                                                                      | Restrictions                              |ColumnType
+|:-------------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------------|-------------------------------------------------------
+| `ModuleName`                               | The name of the module                                                                                           |                                           |Text
+| `ModuleVersionNumber`                      | The version number of the module                                                                                 |                                           |Number
+| `FirstName`                                | The first name of the user                                                                                       |                                           |Text
+| `LastName`                                 | The last name of the user                                                                                        |                                           |Text
+| `Username`                                 | The username of the user                                                                                         | Only available for domains using SSO      |Text
+| `EmailAddress`                             | The email address of the user                                                                                    |                                           |Text
+| `UserCreatedDate`                          | The date when the user was first added, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)                 |                                           |Date
+| `UserInactiveDate`                         | The date when the user was made inactive, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)               |                                           |Date
+| `IsInactive`                               | Whether the user is inactive, as a boolean                                                                       |                                           |Boolean
+| `AllocatedDate`                            | The date when the allocation was created, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)               |                                           |Date
+| `StartedDate`                              | The date when the allocation was started, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)               |                                           |Date
+| `CompletedDate`                            | The date when the allocation was started, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)               |                                           |Date
+| `DeadlineDate`                             | The date of the allocation's deadline, if applicable, as dd-MMM-yyyy HH:mm (soon to change to ISO 8601 format)   |                                           |Date
+| `ProgressPercentage`                       | The percentage progress of the allocation                                                                        |                                           |Number
+| `ProgressName`                             | The progress state of the allocation, either NotAttempted, InProgress or Completed                               |                                           |Text
+| `IsNotStarted`                             | Whether the allocation has not been started, as a boolean                                                        |                                           |Boolean
+| `IsInProgress`                             | Whether the allocation is in progress, as a boolean                                                              |                                           |Boolean
+| `IsComplete`                               | Whether the allocation is completed, as a boolean                                                                |                                           |Boolean
+| `ContentStatusName`                        | The content state of the allocation, either Incomplete, Passed or Failed                                         |                                           |Text
+| `IsIncomplete`                             | Whether the allocation is incomplete, as a boolean                                                               |                                           |Boolean
+| `IsPassed`                                 | Whether the allocation is passed, as a boolean                                                                   |                                           |Boolean
+| `IsFailed`                                 | Whether the allocation is failed, as a boolean                                                                   |                                           |Boolean
+| `IsAwaitingLicence`                        | Whether the allocation is awaiting a licence, as a boolean                                                       |                                           |Boolean
+| `IsOverdue`                                | Whether the allocation is overdue, as a boolean                                                                  |                                           |Boolean
+| `FailedAttemptsTotal`                      | The total number of failed attempts                                                                              |                                           |Number
+| `ReallocationsTotal`                       | The total number of reallocations                                                                                |                                           |Number
+| `TimeTakenTotalSeconds`                    | The total time taken so far in the modules, in seconds                                                           |                                           |Duration
+| `AllocationVia`                            | The source of the allocation                                                                                     |                                           |Text
+| `AllocationMethod`                         | The method by which the allocation was created                                                                   |                                           |Text
+| `AllocatedFromGroupName`                   | The name of the group from which the allocation was created, if applicable                                       |                                           |Text
+| `AllocatedFromLearningCollectionName`      | The name of the learning collection from which the allocation was created, if applicable                         | Requires the LearningCollections feature  |Text
+| `AllocatedFromLearningPlanName`            | The name of the learning plan from which the allocation was created, if applicable                               | Requires the LearningPlans feature        |Text
+| `AllocatedFromLearningChunkName`           | The name of the learning chunk from which the allocation was created, if applicable                              | Requires the LearningChunks feature       |Text
+| `IsAllocatedFromGroup`                     | Whether the allocation was created from a group                                                                  |                                           |Boolean
+| `IsAllocatedFromInventory`                 | Whether the allocation was created from a user's inventory                                                       | Requires the Shop feature                 |Boolean
+| `IsAllocatedFromInstance`                  | Whether the allocation was created from the domain                                                               |                                           |Boolean
+| `IsAllocatedFromLearningCollection`        | Whether the allocation was created from a learning collection                                                    | Requires the LearningCollections feature  |Boolean
+| `IsAllocatedFromLearningPlan`              | Whether the allocation was created from a learning plan                                                          | Requires the LearningPlans feature        |Boolean
+| `IsAllocatedFromLearningChunk`             | Whether the allocation was created from a learning chunk                                                         | Requires the LearningChunks feature       |Boolean
+| `IsAutomatic`                              | Whether the allocation was created automatically                                                                 |                                           |Boolean
+| `IsManual`                                 | Whether the allocation was created manually                                                                      |                                           |Boolean
+| `IsSelfEnrol`                              | Whether the allocation was via a self-enrolment                                                                  |                                           |Boolean
+| `Groups`                                   | The comma separated list of groups the user is a member of                                                       |                                           |Text
+| `Branches`                                 | The comma separated list of branches the user is a member of                                                     | Requires the Branching feature            |Text
+| `LineManagers`                             | The comma separated list of line managers of the user                                                            | Requires the LineManager feature          |Text
+| `TelephoneNumber`                          | The telephone number of the user                                                                                 | Requires the optional field to be enabled |Text
+| `JobTitle`                                 | The job title of the user                                                                                        | Requires the optional field to be enabled |Text
+| `EmployeeNumber`                           | The employee number of the user                                                                                  | Requires the optional field to be enabled |Text
+| `DateOfBirth`                              | The date of birth of the user, as dd-MMM-yyyy (soon to change to yyyy-MM-dd)                                     | Requires the optional field to be enabled |Date
+| `ContractedHoursPerWeek`                   | The contracted hours per week of the user                                                                        | Requires the optional field to be enabled |Number
+| `ReportsTo`                                | The name of which the user reports                                                                               | Requires the optional field to be enabled |Text
+| `Location`                                 | The location of the user                                                                                         | Requires the optional field to be enabled |Text
+| `Company`                                  | The company of the user                                                                                          | Requires the optional field to be enabled |Text
+| `Department`                               | The department of the user                                                                                       | Requires the optional field to be enabled |Text
+| `ContractStatus`                           | The contract status of the user                                                                                  | Requires the optional field to be enabled |Text
+| `SecondaryEmailAddress`                    | The secondary email address of the user                                                                          | Requires the optional field to be enabled |Text
+| `UserStartDate`                            | The start date of the user                                                                                       | Requires the optional field to be enabled |Date
+
+
+The **comparison types** for each of the **column types** are as follows:
++ `Text` - contains, doesnotcontain, startswith, endswith, matchesexactly, isempty, isnotempty
++ `Number` - greaterthan, greaterthanorequalto, lessthan, lessthanorequalto, equals, notequalto, between, notbetween
++ `Date` - equals, before, from, between
++ `Duration` - greaterthan, greaterthanorequalto, lessthan, lessthanorequalto, equals, notequalto
+
 
 Returned object -
 + `rows` The list of rows
@@ -1858,7 +1885,35 @@ No results will return an object with an empty **rows** array.
     + Body
     
             {
-                columns: ["FirstName", "LastName"]
+                columns: ["FirstName", "LastName", "TimeTakenTotalSeconds", "ProgressPercentage", "IsCompleted"],
+                filterLogicOperator: "or",
+                filters: [
+                {
+                columnName: "FirstName",
+                comparisonType: "matchesexactly",
+                value: "Jamie"
+                },
+                {
+                columnName: "LastName",
+                comparisonType: "contains",
+                value: "Bur"
+                },
+                {
+                columnName: "TimeTakenTotalSeconds",
+                comparisonType: "greaterThan",
+                hours: 1,
+                minutes: 0
+                },
+                {
+                columnName: "IsCompleted",
+                value: true
+                }
+                {
+                columnName: "ProgressPercentage",
+                comparisonType: "between",
+                from: 25,
+                to: 50
+                }]
             }
     
 + Response 200 (application/json)
@@ -1888,9 +1943,53 @@ No results will return an object with an empty **rows** array.
                   "hasCellColor": false
                 }
               ]
+            },
+            {
+              "cells": [
+                {
+                  "column": "Time Taken Total Seconds",
+                  "columnInternalName": "TimeTakenTotalSeconds",
+                  "value": "9389",
+                  "cellColor": "",
+                  "textColor": "F000000",
+                  "hasCellColor": false
+                }
+              ]
+            },
+             {
+              "cells": [
+                {
+                  "column": "Progress Percent",
+                  "columnInternalName": "ProgressPercentage",
+                  "value": "100.0",
+                  "cellColor": "",
+                  "textColor": "F000000",
+                  "hasCellColor": false
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "column": "Is Completed",
+                  "columnInternalName": "IsCompleted",
+                  "value": "True",
+                  "cellColor": "",
+                  "textColor": "F000000",
+                  "hasCellColor": false
+                }
+              ]
             }
           ]
         }
+
+
++ Response 400
+
+        [
+            "Error description 1",
+            "Error description 2"
+        ]
 
 + Response 401
 
