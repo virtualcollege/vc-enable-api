@@ -1888,32 +1888,33 @@ No results will return an object with an empty **rows** array.
                 columns: ["FirstName", "LastName", "TimeTakenTotalSeconds", "ProgressPercentage", "IsCompleted"],
                 filterLogicOperator: "or",
                 filters: [
-                {
-                columnName: "FirstName",
-                comparisonType: "matchesexactly",
-                value: "Jamie"
-                },
-                {
-                columnName: "LastName",
-                comparisonType: "contains",
-                value: "Bur"
-                },
-                {
-                columnName: "TimeTakenTotalSeconds",
-                comparisonType: "greaterThan",
-                hours: 1,
-                minutes: 0
-                },
-                {
-                columnName: "IsCompleted",
-                value: true
-                }
-                {
-                columnName: "ProgressPercentage",
-                comparisonType: "between",
-                from: 25,
-                to: 50
-                }]
+                    {
+                        columnName: "FirstName",
+                        comparisonType: "matchesexactly",
+                        value: "Jamie"
+                    },
+                    {
+                        columnName: "LastName",
+                        comparisonType: "contains",
+                        value: "Bur"
+                    },
+                    {
+                        columnName: "TimeTakenTotalSeconds",
+                        comparisonType: "greaterThan",
+                        hours: 1,
+                        minutes: 0
+                    },
+                    {
+                        columnName: "IsCompleted",
+                        value: true
+                    }
+                    {
+                        columnName: "ProgressPercentage",
+                        comparisonType: "between",
+                        from: 25,
+                        to: 50
+                    }
+                ]
             }
     
 + Response 200 (application/json)
