@@ -171,10 +171,11 @@ No results will return `totalModules: 0` and an empty array.
 ## User Has Allocation [/learn/modules/userHasAllocation]
 Check if the user has the module allocated in shop domain.
 
-The parameters are -
-+ `emailAddress` Email Address of the user that needs to be checked
-+ `moduleReference` The reference of the module.
-+ `isPosted`: This is whether the module has a posted certificate. 
+The parameters are:
++ `emailAddress` *(Required for domains using email address to identify the user)* Email Address of the user that needs to be checked
++ `userName` *(Required for domains using user name to identify the user)* User Name of the user that needs to be checked
++ `moduleReference` *(Required)* The reference of the module.
++ `isPosted`: *(Optional, defaults to false)* This is whether the module has a posted certificate. 
 
 Returned properties are -
 + `allocationUrl` This is empty if the user doesn't exist or hasn't got the allocation. Otherwise returns the url to the module overview page.
@@ -196,6 +197,7 @@ Returned properties are -
         
             { 
                 "emailAddress": "xyz@vc.com", 
+                "userName": "xyz",
                 "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
                 "isPosted": false
             }
@@ -219,9 +221,10 @@ Returned properties are -
 Creates user if doesn't exist and allocates the module irrespective of whether the user already has one or not.
 
 The parameters are -
-+ `emailAddress` Email Address of the user that needs to be checked
-+ `moduleReference` The reference of the module.
-+ `isPosted`: This is whether the module has a posted certificate. 
++ `emailAddress` *(Required)* Email Address of the user that needs to be checked
++ `userName` *(Required for domains using user name to identify the user)* User Name of the user that needs to be checked
++ `moduleReference` *(Required)* The reference of the module.
++ `isPosted`: *(Optional, defaults to false)* This is whether the module has a posted certificate. 
 
 Returned properties are -
 + `allocationUrl` Returns the url to take the user to the module overview page.
@@ -241,6 +244,7 @@ Returned properties are -
         
             { 
                 "emailAddress": "xyz@vc.com", 
+                "userName": "xyz",
                 "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
                 "isPosted": false
             }
@@ -266,6 +270,7 @@ The modules purchased will be attributed to the specified user.
 
 The parameters are -
 + `emailAddress` *(Required)* The email address of the user to whom the purchase is to be attributed
++ `userName` *(Required for domains using user name to identify the user)* The user name of the user to whom the purchase is to be attributed
 + `orderNumber` *(Required)* The order number of the purchase.  Can be alpha-numeric, maximum 50 characters
 + `orderDate` *(Required)* The date of the order.  Must be in the **ISO 8601** format
 + `totalAmount` *(Required)* The grand total of the order, including VAT and after any discounts have been applied.  Must be in the currency specified in `currencyCode`, and be a valid currency value
@@ -300,6 +305,7 @@ that the user will complete to confirm their account.
         
             { 
                 "emailAddress": "darren.lawson@virtual-college.co.uk", 
+                "userName": "dl", 
                 "orderNumber": "abc123",
                 "orderDate": "2012-04-23T18:25:43.511Z",
                 "totalAmount": 190.12,
@@ -366,7 +372,7 @@ User related resources of the **Enable API**
 Gets a list of users.
 
 The parameters are -
-+ `search` *(optional)* A free-text search that filters the list of users based on the first name, last name and email address of the user (case insensitive).
++ `search` *(optional)* A free-text search that filters the list of users based on the first name, last name, user name and email address of the user (case insensitive).
 + `pageSize` *(optional, defaults to 12)* The number of items to return for a page
 + `pageNumber` *(optional, defaults to 1)* The requested page.  This number is 1-based (such as the first page is `pageNumber: 1`)
 + `order` *(optional, defaults to AlphaAscending)* The order of the users.  The available options are -
@@ -382,6 +388,7 @@ Returned properties are -
 + `users\firstName` This is the first name of the user
 + `users\lastName` This is the last name of the user
 + `users\emailAddress` This is the email address of the user
++ `users\userName` This is the user name of the user
 + `users\createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
 + `users\additional` An array of additional properties, including optional fields
 + `users\additional\name` The name of the property, in English
@@ -419,6 +426,7 @@ No results will return `totalUsers: 0` and an empty array.
                     "reference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
                     "firstName": "Jamie",
                     "lastName": "Burns",
+                    "userName": "jamie.burns@virtual-college.co.uk",
                     "emailAddress": "jamie.burns@virtual-college.co.uk",
                     "createdDate": "2012-04-23T18:25:43.511Z",
                     "additional":
@@ -437,6 +445,7 @@ No results will return `totalUsers: 0` and an empty array.
                     "reference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
                     "firstName": "Alex",
                     "lastName": "Woodhead",
+                    "userName": "alex.woodhead@virtual-college.co.uk",
                     "emailAddress": "alex.woodhead@virtual-college.co.uk",
                     "createdDate": "2013-04-23T18:25:43.511Z",
                     "additional": []
@@ -448,17 +457,18 @@ No results will return `totalUsers: 0` and an empty array.
 
 + Response 404
 
-## Manage User Details [/users/{emailAddress}]
+## Manage User Details [/users/{userIdentifier}]
 Gets or updates the details of a specific user.
 
 The parameters are -
-+ `emailAddress` *(required)* The exact email address to search by (case insensitive).  This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
 
 Returned properties are -
 + `reference` The reference of the user within an LMS.  This is a **GUID**
 + `firstName` This is the first name of the user
 + `lastName` This is the last name of the user
 + `emailAddress` This is the email address of the user
++ `userName` This is the user name of the user
 + `createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
 + `additional` An array of additional properties, including optional fields
 + `additional\name` The name of the property, in English
@@ -467,7 +477,8 @@ Returned properties are -
 When updating, only the following properties can be changed -
 + `firstName` *(required)* This can be freely changed. Maximum 255 characters
 + `lastName` *(required)* This can be freely changed. Maximum 255 characters
-+ `emailAddress` *(required)* This can only be changed if the user does not exist in other LMSs, and if the user has not logged in. Maximum 255 characters
++ `emailAddress` *(required)* This can only be changed if the user with the same email address does not exist in other LMSs. Maximum 255 characters
++ `userName` *(required for domains using user name to identify the user)* This can only be changed if the user with the same user name does not exist in current LMSs. Maximum 255 characters
 + `additional` *(optional)* An array of additional properties, including optional fields.  Any fields not provided in the list will remain unchanged when persisted
 + `additional\name` *(required)* The name of the property, in English
 + `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
@@ -489,6 +500,7 @@ When updating, only the following properties can be changed -
             "reference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
             "firstName": "Jamie",
             "lastName": "Burns",
+            "userName": "jamie.burns@virtual-college.co.uk",
             "emailAddress": "jamie.burns@virtual-college.co.uk",
             "createdDate": "2012-04-23T18:25:43.511Z",
             "additional":
@@ -525,6 +537,7 @@ When updating, only the following properties can be changed -
                 "firstName": "Jamie",
                 "lastName": "Burns",
                 "emailAddress": "jamie.burns@virtual-college.co.uk",
+                "userName": "jamie.burns@virtual-college.co.uk",
                 "additional":
                 [
                     {
@@ -541,6 +554,7 @@ When updating, only the following properties can be changed -
             "firstName": "Jamie",
             "lastName": "Burns",
             "emailAddress": "jamie.burns@virtual-college.co.uk",
+            "userName": "jamie.burns@virtual-college.co.uk",
             "createdDate": "2012-04-23T18:25:43.511Z",
             "additional":
             [
@@ -586,6 +600,7 @@ Creates a new user
 
 The parameters are -
 + `emailAddress` *(required)* The user's email address. Maximum 255 characters, and must be of a valid email address format
++ `userName` *(required for domain using user name to identify the user)* The user's user name. Maximum 255 characters
 + `firstName` *(required)* The user's first name. Maximum 255 characters
 + `lastName` *(required)* This user's last name. Maximum 255 characters
 + `additional` *(optional)* An array of additional properties, including optional fields
@@ -598,6 +613,7 @@ Returned properties are -
 + `firstName` This is the first name of the user
 + `lastName` This is the last name of the user
 + `emailAddress` This is the email address of the user
++ `userName` This is the user name of the user
 + `createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
 + `additional\name` *(required)* The name of the property, in English
 + `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
@@ -620,6 +636,7 @@ Returned properties are -
                 "firstName": "Jamie",
                 "lastName": "Burns",
                 "emailAddress": "jamie.burns@virtual-college.co.uk",
+                "userName": "jb",
                 "additional":
                 [
                     {
@@ -641,6 +658,7 @@ Returned properties are -
             "firstName": "Jamie",
             "lastName": "Burns",
             "emailAddress": "jamie.burns@virtual-college.co.uk",
+            "userName": "jb",
             "createdDate": "2012-04-23T18:25:43.511Z",
             "additional":
             [
@@ -663,12 +681,6 @@ Returned properties are -
         }
 
 + Response 404
-
-+ Response 409
-
-        {
-            "User with the same email address already exists within the domain."
-        }
 
 ## Optional Fields [/users/optionalFields]
 Gets the list of available optional fields
@@ -1396,7 +1408,7 @@ The available columns are -
 |:-----------------------------------------|-----------------------------------------------------------------------------|-------------------------------------------|
 | `FirstName`                              | The first name of the user                                                  |                                           |
 | `LastName`                               | The last name of the user                                                   |                                           |
-| `UserName`                               | The username of the user                                                    | Only available for domains using SSO      |
+| `UserName`                               | The username of the user                                                    | Only available for domains using SSO or user name identification |
 | `EmailAddress`                           | The email address of the user                                               |                                           |
 | `HasLoggedIn`                            | Whether the user has logged in, as a boolean                                |                                           |
 | `FirstLogin`                             | The date when the user first logged in, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)                  |                                           |
@@ -1799,7 +1811,7 @@ The available columns are -
 | `ModuleVersionNumber`                      | The version number of the module                                                                                 |                                           |Number
 | `FirstName`                                | The first name of the user                                                                                       |                                           |Text
 | `LastName`                                 | The last name of the user                                                                                        |                                           |Text
-| `Username`                                 | The username of the user                                                                                         | Only available for domains using SSO      |Text
+| `Username`                                 | The username of the user                                                                                         | Only available for domains using SSO or user name identification      |Text
 | `EmailAddress`                             | The email address of the user                                                                                    |                                           |Text
 | `UserCreatedDate`                          | The date when the user was first added, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)                 |                                           |Date
 | `UserInactiveDate`                         | The date when the user was made inactive, as ISO 8601 format in UTC (YYYY-MM-DDTHH:MM:SSZ)               |                                           |Date
