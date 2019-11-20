@@ -55,7 +55,16 @@ Endpoint to retrieve a single Authorisation Token for use in creating an Access 
 ## Access Tokens [/access-tokens]
 Access tokens used to authenticate a client with the API.
 
-The *signedAuthorisationToken* property is made up from the *authorisationToken* returned from the previous call, then encoded as a **JsonWebToken** (using HS512) where the *authorisationToken* is the payload and the LMS public key as the key.
+The *signedAuthorisationToken* property is made up from the *authorisationToken* returned from the previous call, then encoded  using **JwtEncoder** as follows
+
+``` 
+    var data = JsonConvert.DeserializeObject<Dictionary<string,string>>(signedAuthorisationToken);
+    JwtEncoder encoder = new JwtEncoder(new JWT.Algorithms.HMACSHA512Algorithm(), new JsonNetSerializer(), new JwtBase64UrlEncoder());
+    authToken = encoder.Encode(data, apiPublicKey);
+
+```
+
+where the *apiPublicKey* is the LMS public key.
 
 ### Create an Access Token [POST]
 + Request (application/json)
@@ -1968,7 +1977,7 @@ The parameters are -
 
 + `filters\columnName` *(required)* The name of the column to which the filter needs to be applied
 
-+ `filters\comparisonType` *(required)* Except for **boolean** columnn type, this is required for all the other types. It can have values like **contains**, **greater than**, **between**
++ `filters\comparisonType` *(required)* Except for **boolean** columnn type, this is required for all the other types. It can have values like **contains**, **greater than**, **between**. See below for the full list of acceptable values.
 
 + `filters\value`  If the comparison type is other than **between**, then this is a required field
 
@@ -2094,9 +2103,9 @@ No results will return an object with an empty **rows** array.
                         minutes: 0
                     },
                     {
-                        columnName: "IsCompleted",
+                        columnName: "IsComplete",
                         value: true
-                    }
+                    },
                     {
                         columnName: "ProgressPercentage",
                         comparisonType: "between",
