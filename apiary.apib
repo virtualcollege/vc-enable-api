@@ -1,7 +1,11 @@
 FORMAT: 1A
 
 # Enable API
-Enable API is a service for integrating with Virtual College's Enable product. It is available at: https://external-api.vc-enable.co.uk/
+Enable API is a service for integrating with Virtual College's Enable platform. It is available at: https://external-api.vc-enable.co.uk/.
+
+The Enable API can be used to retrieve information that is stored within Enable, as well as carrying out several actions.  See the documentation below for what is available via this API.  In the vast majority of cases, custom development work will be required to be carried out by customers to interact with this API.
+
+The API is designed to be used by other pieces of software, with the aim to support integration with other systems.  Whilst the API can be used manually (via an interface such as [Postman](https://www.getpostman.com/)), we expect most users to have custom software written to call the API.  The API (or Enable) cannot communicate directly with other systems, but the API has been made available so other systems can make use of it and perform the required actions.
 
 # Usage
 Every request to the API must specify the following headers:
