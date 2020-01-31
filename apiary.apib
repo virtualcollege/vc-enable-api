@@ -486,8 +486,8 @@ Returned properties are -
 When updating, only the following properties can be changed -
 + `firstName` *(required)* This can be freely changed. Maximum 255 characters
 + `lastName` *(required)* This can be freely changed. Maximum 255 characters
-+ `emailAddress` *(required)* This can only be changed if the user with the same email address does not exist in other LMSs. Maximum 255 characters
-+ `userName` *(required for domains using user name to identify the user)* This can only be changed if the user with the same user name does not exist in current LMSs. Maximum 255 characters
++ `emailAddress` *(required)* This can only be changed if the user with the same email address does not exist in other LMSs. Maximum 100 characters
++ `userName` *(required for domains using user name to identify the user)* This can only be changed if the user with the same user name does not exist in current LMSs. Maximum 100 characters
 + `additional` *(optional)* An array of additional properties, including optional fields.  Any fields not provided in the list will remain unchanged when persisted
 + `additional\name` *(required)* The name of the property, in English
 + `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
@@ -612,8 +612,8 @@ When updating, only the following properties can be changed -
 Creates a new user
 
 The parameters are -
-+ `emailAddress` *(required)* The user's email address. Maximum 255 characters, and must be of a valid email address format
-+ `userName` *(required for domain using user name to identify the user)* The user's user name. Maximum 255 characters
++ `emailAddress` *(required)* The user's email address. Maximum 100 characters, and must be of a valid email address format
++ `userName` *(required for domain using user name to identify the user)* The user's user name. Maximum 100 characters
 + `firstName` *(required)* The user's first name. Maximum 255 characters
 + `lastName` *(required)* This user's last name. Maximum 255 characters
 + `additional` *(optional)* An array of additional properties, including optional fields
@@ -752,8 +752,8 @@ The parameters are -
 + `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID
 + `firstName` *(required)* The first name of the user.  Maximum 255 characters
 + `lastName` *(required)* The last name of the user.  Maximum 255 characters
-+ `emailAddress` *(required)* The email address of the user.  Maximum 255 characters
-+ `accountName` *(optional)* The account name of the user.  For AD FS SSO, this should be the SamAccountName.  Maximum 255 characters
++ `emailAddress` *(required)* The email address of the user.  Maximum 100 characters
++ `accountName` *(optional)* The account name of the user.  For AD FS SSO, this should be the SamAccountName.  Maximum 100 characters
 + `groupReferences` *(optional)* An array of Groups (GUIDs) to add the user to. Users are only added to groups via this call, not removed.
 + `lineManagers` *(optional)* An array of Line Manager User Ids (SIDs) to associate with the user. Line Managers are only added to users via this call, not removed.
 
@@ -997,7 +997,7 @@ Users who exist in multiple LMSs are counted only once.
 Set a user as inactive.
 
 The parameters are -
-+ `emailAddress` *(required)* The user's email address. Maximum 255 characters, and must be of a valid email address format
++ `emailAddress` *(required)* The user's email address. Maximum 100 characters, and must be of a valid email address format
 
 ### SetInactive [POST]
 
@@ -1026,7 +1026,7 @@ The parameters are -
 Set a user as active.
 
 The parameters are -
-+ `emailAddress` *(required)* The user's email address. Maximum 255 characters, and must be of a valid email address format
++ `emailAddress` *(required)* The user's email address. Maximum 100 characters, and must be of a valid email address format
 
 ### SetInactive [POST]
 
