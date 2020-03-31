@@ -388,6 +388,7 @@ The parameters are -
 + `search` *(optional)* A free-text search that filters the list of users based on the first name, last name, user name and email address of the user (case insensitive).
 + `pageSize` *(optional, defaults to 12)* The number of items to return for a page
 + `pageNumber` *(optional, defaults to 1)* The requested page.  This number is 1-based (such as the first page is `pageNumber: 1`)
++ `retrieveAll` *(optional, defaults to false)* When set to true, brings all the users
 + `order` *(optional, defaults to AlphaAscending)* The order of the users.  The available options are -
     + AlphaAscending
     + AlphaDescending
@@ -403,6 +404,7 @@ Returned properties are -
 + `users\emailAddress` This is the email address of the user
 + `users\userName` This is the user name of the user
 + `users\createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
++ `users\providerUserKey` This is the security identifier of the ADFS user (only applicable for SSO AD domains)
 + `users\additional` An array of additional properties, including optional fields
 + `users\additional\name` The name of the property, in English
 + `users\additional\value` The value of the property.  The type will be dependent on the type of the field itself
@@ -442,6 +444,7 @@ No results will return `totalUsers: 0` and an empty array.
                     "userName": "jamie.burns@virtual-college.co.uk",
                     "emailAddress": "jamie.burns@virtual-college.co.uk",
                     "createdDate": "2012-04-23T18:25:43.511Z",
+					"providerUserKey":"",
                     "additional":
                     [
                         {
@@ -461,6 +464,7 @@ No results will return `totalUsers: 0` and an empty array.
                     "userName": "alex.woodhead@virtual-college.co.uk",
                     "emailAddress": "alex.woodhead@virtual-college.co.uk",
                     "createdDate": "2013-04-23T18:25:43.511Z",
+					"providerUserKey":"",
                     "additional": []
                 }
             ]
