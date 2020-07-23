@@ -96,293 +96,23 @@ where the *apiPublicKey* is the LMS public key.
 
 + Response 404
 
-# Group Learn
+# Group Users - Common
+Common User related resources of the **Enable API**
 
-## Modules [/learn/modules/search]
+**Who can use these endpoints?**
 
-List modules that can be shown in a shop.
+The endpoints in this section can be used by all customers, including those that have Enable configured to authenticate users with:
 
-This will include all modules available to the API's 
-LMS (including self-created modules and licenced modules).
-Includes a free-text search that filters the list of modules.
++ Email Address
++ Username
++ AD FS (SSO)
 
-The parameters are -
-+ `search` *(optional)* A free-text search that filters the list of modules based on the name of the module (case insensitive).
-+ `pageSize` *(optional, defaults to 12)* The number of items to return for a page
-+ `pageNumber` *(optional, defaults to 1)* The requested page.  This number is 1-based (such as the first page is `pageNumber: 1`)
-+ `order` *(optional, defaults to AlphaAscending)* The order of the modules.  The available options are -
-    + AlphaAscending
-    + AlphaDescending
-    + DateAscending
-    + DateDescending
-
-Returned properties are -
-+ `totalModules` The total number of modules that match the current request, across all pages.  This is an **INT**
-+ `modules` An array of modules
-+ `modules\moduleReference` The reference of the module.  This is the reference that should be used when informing the LMS of any purchases.  This is a **GUID**
-+ `modules\name` This is the name of the module, in English
-+ `modules\description` This is the description of the module, in English
-+ `modules\publishDate` This is the date and time at which the module was last published.  This date is **UTC**, according to **ISO 8601**.
-+ `modules\isPosted` This is whether the module has a posted certificate.  Where an LMS is licenced a posted and non-posted version of the module, the module will appear twice in the list.  This is a **BOOL**
-
-No results will return `totalModules: 0` and an empty array.
-
-### Retrieve modules [POST]
-
-+ Request (application/json)
-
-    + Header
-
-            x-api-version: 1.0
-            x-api-nonce: 2147483647
-            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
-            x-api-language: en-GB
-            
-    + Body
-        
-            { 
-                "search": "module1", 
-                "pageSize": 24,
-                "pageNumber": 1,
-                "order": "DateDescending"
-            }
-    
-+ Response 200 (application/json)
-
-        { 
-            "totalModules": 123, 
-            "modules": 
-            [
-                {
-                    "moduleReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                    "name": "Module1",
-                    "description": "This is module 1",
-                    "publishDate": "2012-04-23T18:25:43.511Z",
-                    "isPosted": false
-                },
-                {
-                    "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                    "name": "Module2",
-                    "description": "This is module 2",
-                    "publishDate": "2012-04-23T18:25:43.511Z",
-                    "isPosted": false
-                },
-                {
-                    "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                    "name": "Module2",
-                    "description": "This is module 2",
-                    "publishDate": "2012-04-23T18:25:43.511Z",
-                    "isPosted": true
-                }
-            ]
-        }
-
-+ Response 401
-
-+ Response 404
-
-## User Has Allocation [/learn/modules/userHasAllocation]
-Check if the user has the module allocated in shop domain.
-
-The parameters are:
-+ `emailAddress` *(Required for domains using email address to identify the user)* Email Address of the user that needs to be checked
-+ `userName` *(Required for domains using user name to identify the user)* User Name of the user that needs to be checked
-+ `moduleReference` *(Required)* The reference of the module.
-+ `isPosted`: *(Optional, defaults to false)* This is whether the module has a posted certificate. 
-
-Returned properties are -
-+ `allocationUrl` This is empty if the user doesn't exist or hasn't got the allocation. Otherwise returns the url to the module overview page.
-+ `hasAllocation` A boolean value to denote if the user has allocation or not.
-
-
-### Check user has allocation [POST]
-
-+ Request (application/json)
-
-    + Header
-
-            x-api-version: 1.0
-            x-api-nonce: 2147483647
-            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
-            x-api-language: en-GB
-            
-    + Body
-        
-            { 
-                "emailAddress": "xyz@vc.com", 
-                "userName": "xyz",
-                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                "isPosted": false
-            }
-    
-+ Response 200 (application/json)
-
-        {
-        "allocationUrl": "https://bedrock-web.devmachine.com/Learn/Learning/LearnerRecord?reference=398e9d7b-e1c7-4ce7-aff8-f6dfcbf45f30",
-        "hasAllocation": true
-        }
-        
-+ Response 400
-
-        [
-            "Error description 1",
-            "Error description 2"
-        ]
-
-
-## Allocate To User [/learn/modules/allocateToUser]
-Creates user if doesn't exist and allocates the module irrespective of whether the user already has one or not.
-
-The parameters are -
-+ `emailAddress` *(Required)* Email Address of the user that needs to be checked
-+ `userName` *(Required for domains using user name to identify the user)* User Name of the user that needs to be checked
-+ `moduleReference` *(Required)* The reference of the module.
-+ `isPosted`: *(Optional, defaults to false)* This is whether the module has a posted certificate. 
-
-Returned properties are -
-+ `allocationUrl` Returns the url to take the user to the module overview page.
-
-### Allocate module to user [POST]
-
-+ Request (application/json)
-
-    + Header
-
-            x-api-version: 1.0
-            x-api-nonce: 2147483647
-            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
-            x-api-language: en-GB
-            
-    + Body
-        
-            { 
-                "emailAddress": "xyz@vc.com", 
-                "userName": "xyz",
-                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                "isPosted": false
-            }
-    
-+ Response 200 (application/json)
-
-        {
-        "allocationUrl": "https://bedrock-web.devmachine.com/Learn/Learning/LearnerRecord?reference=398e9d7b-e1c7-4ce7-aff8-f6dfcbf45f30"
-        }
-        
-+ Response 400
-
-        [
-            "Error description 1",
-            "Error description 2"
-        ]
-
-# Group Shop
-
-## Purchases [/shop/purchases]
-Records a purchase of modules made by a user outside of the LMS.
-The modules purchased will be attributed to the specified user.
-
-The parameters are -
-+ `emailAddress` *(Required)* The email address of the user to whom the purchase is to be attributed
-+ `userName` *(Required for domains using user name to identify the user)* The user name of the user to whom the purchase is to be attributed
-+ `orderNumber` *(Required)* The order number of the purchase.  Can be alpha-numeric, maximum 50 characters
-+ `orderDate` *(Required)* The date of the order.  Must be in the **ISO 8601** format
-+ `totalAmount` *(Required)* The grand total of the order, including VAT and after any discounts have been applied.  Must be in the currency specified in `currencyCode`, and be a valid currency value
-+ `currencyCode` *(Required)* The currency of the totals used in the order.  The code should be a valid **ISO 4217** code.
-+ `vatAmount` *(Required)* The total VAT charged for the order.  Must be in the currency specified in `currencyCode`, and be a valid currency value
-+ `discountAmount` *(Optional, defaults to 0)* The total amount discounted form the order.  Must be in the currency specified in `currencyCode`, and be a valid currency value
-+ `products` *(Required)* The list of products included in the order.  Must contain at least one item
-+ `product\name` *(Required)* The name of the product.  Can be alpha-numeric, maximum 255 characters
-+ `product\id` *(Required)* The id of the product, as defined by the calling application.  Can be alpha-numberic, maximum 255 characters
-+ `product\unitPrice` *(Required)* The price for a purchase of the product with a quantity of 1, before VAT and before any discounts applied.  Must be in the currency specified in `currencyCode`, and be a valid currency value
-+ `product\quantity` *(Required)* The quantity of the product in the order.  Must be an **INT**
-+ `product\modules` *(Required)* The modules associated with the product.  Must contain at least one item
-+ `product\module\moduleReference` *(Required)* The reference of the module.  This is the reference provided by the LMS via the API.  Must be a **GUID**
-+ `product\module\quantity` *(Optional, defaults to 1)* The number of modules included in the product.  If no quantity is provided, a default of **1** is used.  Must be an **INT**
-+ `product\module\isPosted` *(Optional, defaults to false)* Whether the product should be posted.  Must be a **BOOL**
-
-Returns `201` if the operation was successful, otherwise one of the error codes is returned.  Also returns the URL to which
-the user should be directed.  If the user has been created as part of this call, then this link redirects to the confirmation page
-that the user will complete to confirm their account.
-
-### Add purchases [POST]
-
-+ Request (application/json)
-    + Header
-    
-            x-api-version: 1.0
-            x-api-nonce: 2147483647
-            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
-            x-api-language: en-GB
-            
-    + Body
-        
-            { 
-                "emailAddress": "darren.lawson@virtual-college.co.uk", 
-                "userName": "dl", 
-                "orderNumber": "abc123",
-                "orderDate": "2012-04-23T18:25:43.511Z",
-                "totalAmount": 190.12,
-                "currencyCode": "GBP",
-                "vatAmount": 40.00,
-                "discountAmount": 12.34,
-                "products": 
-                [
-                    {
-                        "name": "Product1",
-                        "id": "abc123",
-                        "unitPrice": 12.34,
-                        "quantity": 1,
-                        "modules":
-                        [
-                            {
-                                "moduleReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                                "quantity": 3,
-                                "isPosted": true
-                            },
-                            {
-                                "moduleReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                                "quantity": 2,
-                                "isPosted": false
-                            },
-                            {
-                                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                                "quantity": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "Product2",
-                        "id": "def456",
-                        "unitPrice": 34.21,
-                        "quantity": 1,
-                        "modules":
-                        [
-                            {
-                                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                                "quantity": 1
-                            }
-                        ]
-                    }
-                ]
-            }
-
-+ Response 201
-
-        https://www.vc-enable.co.uk
-
-+ Response 400
-
-        The request is badly formed, or is missing something required
-
-+ Response 401
-
-+ Response 404
-
-# Group Users
-User related resources of the **Enable API**
+For other endpoints relating to users, see <a href="#reference/users-standard-authentication">Users - Standard Authentication</a> for Email Address/Username domains, and <a href="#reference/users-ad-fs-authentication">Users - AD FS Authentication</a> for AD FS domains.
 
 ## Find Users [/users/search]
 Gets a list of users.
+
+### Search [POST]
 
 The parameters are -
 + `search` *(optional)* A free-text search that filters the list of users based on the first name, last name, user name and email address of the user (case insensitive).
@@ -410,8 +140,6 @@ Returned properties are -
 + `users\additional\value` The value of the property.  The type will be dependent on the type of the field itself
 
 No results will return `totalUsers: 0` and an empty array.
-
-### Search [POST]
 
 + Request (application/json)
 
@@ -474,6 +202,202 @@ No results will return `totalUsers: 0` and an empty array.
 
 + Response 404
 
+## Optional Fields [/users/optionalFields]
+Gets the list of available optional fields
+
+Returned properties are -
++ `name` The name of the optional field, in English
++ `type` The descriptive type of the optional field
+
+The types available are -
++ `String` A string
++ `Number` A number
++ `Date` A date
++ `PassedDate` A date in the past
++ `PositiveNumber` A positive number
++ `NonLocalisedPassedDate` A date without time, which is in the past
++ `NonLocalisedDate` A date without time
+
+### List [GET]
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        [
+            {
+                "name": "DateOfBirth",
+                "type": "Unlocalised date in the past",
+            },
+            {
+                "name": "JobTitle",
+                "type": "Text",
+            }
+        ]
+
++ Response 401
+
++ Response 404
+
+## Count Users - Current Day [/users/recentCount]
+A count of the number of users added, and who have logged in, since midnight (UTC).  This counts users across all domains for all customers.
+
+Users who exist in multiple LMSs are counted only once.
+
+### Retrieve recent count [GET]
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        { 
+            123
+        }
+        
++ Response 401
+
++ Response 404
+
+## Count Users - Total [/users/count]
+A count of the number of users added, and who have logged in, in total.  This counts users across all domains for all customers.
+
+Users who exist in multiple LMSs are counted only once.
+
+### Retrieve total count [GET]
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        { 
+            1234
+        }
+        
++ Response 401
+
++ Response 404
+
+# Group Users - Standard Authentication
+User related resources of the **Enable API**
+
+**Who can use these endpoints?**
+
+The endpoints in this section can only be used by customers that have Enable configured to authenticate users with either:
++ Email Address
++ Username
+
+Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error, and the endpoints in the <a href="#reference/users-ad-fs-authentication">Users - AD FS Authentication</a> section should be used instead.
+
+## Create User [/users/]
+Creates a new user
+
+### Add [POST]
+
+The parameters are -
++ `emailAddress` *(required)* The user's email address. Maximum 100 characters, and must be of a valid email address format
++ `userName` *(required for domain using user name to identify the user)* The user's user name. Maximum 100 characters
++ `firstName` *(required)* The user's first name. Maximum 255 characters
++ `lastName` *(required)* This user's last name. Maximum 255 characters
++ `additional` *(optional)* An array of additional properties, including optional fields
++ `additional\name` *(required)* The name of the property, in English
++ `additional\value` *(optional)* The value of the property. Maximum 255 characters.  The type will be dependent on the type of the field itself
++ `groupReferences` *(optional)* An array of Groups (GUIDs) to add the user to. Users are only added to groups via this call, not removed.
++ `lineManagerReferences` *(optional)* An array of Users (GUIDs) to associate as Line Managers for the user. Line Managers are only added to Users via this call, not removed.
+
+Returned properties are -
++ `reference` The reference of the user within an LMS.  This is a **GUID**
++ `firstName` This is the first name of the user
++ `lastName` This is the last name of the user
++ `emailAddress` This is the email address of the user
++ `userName` This is the user name of the user
++ `createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
++ `additional\name` *(required)* The name of the property, in English
++ `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            { 
+                "firstName": "Jamie",
+                "lastName": "Burns",
+                "emailAddress": "jamie.burns@virtual-college.co.uk",
+                "userName": "jb",
+                "additional":
+                [
+                    {
+                        "name": "jobTitle",
+                        "value": "Software Architect"
+                    },
+                    {
+                        "name": "userStartDate",
+                        "value": "01-Jan-2016"
+                    }
+                ],
+                "groupReferences": ["e9f27sa5-01fd-4138-9451-e25ddaa70a7d","c9f2b0a5-01fd-4138-9451-e25ddaa70a9a"],
+                "lineManagerReferences": ["b2d3c693-9b0e-4842-bec2-38a82c9f5569","cc93f516-50ff-4376-be37-0682cf9b0671"]
+            }
+            
++ Response 201 (application/json)
+
+        {
+            "reference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+            "firstName": "Jamie",
+            "lastName": "Burns",
+            "emailAddress": "jamie.burns@virtual-college.co.uk",
+            "userName": "jb",
+            "createdDate": "2012-04-23T18:25:43.511Z",
+            "additional":
+            [
+                {
+                    "name": "jobTitle",
+                    "value": "Software Architect"
+                },
+                {
+                    "name": "userStartDate",
+                    "value": "01-Jan-2016"
+                }
+            ]
+        }
+
++ Response 401
+
+        {
+            "Error description 1",
+            "Error description 2"
+        }
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
 
 ## Manage User Details [/users/{userIdentifier}]
 Gets or updates the details of a specific user.
@@ -544,6 +468,10 @@ When patching, only the following properties can be changed -
 
 + Response 401
 
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
 + Response 404
 
 ### Update [PUT]
@@ -606,6 +534,10 @@ When patching, only the following properties can be changed -
             "Error description 2"
         }
 
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
 + Response 404
 
 ### Patch [PATCH]
@@ -656,6 +588,10 @@ When patching, only the following properties can be changed -
             "Error description 2"
         }
 
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
 + Response 404
 
 ### Delete [DELETE]
@@ -673,34 +609,19 @@ When patching, only the following properties can be changed -
 
 + Response 401
 
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
 + Response 404
 
-## Create User [/users/]
-Creates a new user
+## Set Inactive [/users/{userIdentifier}/SetInactive]
+Set a user as inactive.
+
+### SetInactive [POST]
 
 The parameters are -
-+ `emailAddress` *(required)* The user's email address. Maximum 100 characters, and must be of a valid email address format
-+ `userName` *(required for domain using user name to identify the user)* The user's user name. Maximum 100 characters
-+ `firstName` *(required)* The user's first name. Maximum 255 characters
-+ `lastName` *(required)* This user's last name. Maximum 255 characters
-+ `additional` *(optional)* An array of additional properties, including optional fields
-+ `additional\name` *(required)* The name of the property, in English
-+ `additional\value` *(optional)* The value of the property. Maximum 255 characters.  The type will be dependent on the type of the field itself
-+ `groupReferences` *(optional)* An array of Groups (GUIDs) to add the user to. Users are only added to groups via this call, not removed.
-+ `lineManagerReferences` *(optional)* An array of Users (GUIDs) to associate as Line Managers for the user. Line Managers are only added to Users via this call, not removed.
-
-Returned properties are -
-+ `reference` The reference of the user within an LMS.  This is a **GUID**
-+ `firstName` This is the first name of the user
-+ `lastName` This is the last name of the user
-+ `emailAddress` This is the email address of the user
-+ `userName` This is the user name of the user
-+ `createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
-+ `additional\name` *(required)* The name of the property, in English
-+ `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
-
-
-### Add [POST]
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
 
 + Request (application/json)
 
@@ -712,75 +633,28 @@ Returned properties are -
             x-api-language: en-GB
             
     + Body
-        
-            { 
-                "firstName": "Jamie",
-                "lastName": "Burns",
-                "emailAddress": "jamie.burns@virtual-college.co.uk",
-                "userName": "jb",
-                "additional":
-                [
-                    {
-                        "name": "jobTitle",
-                        "value": "Software Architect"
-                    },
-                    {
-                        "name": "userStartDate",
-                        "value": "01-Jan-2016"
-                    }
-                ],
-                "groupReferences": ["e9f27sa5-01fd-4138-9451-e25ddaa70a7d","c9f2b0a5-01fd-4138-9451-e25ddaa70a9a"],
-                "lineManagerReferences": ["b2d3c693-9b0e-4842-bec2-38a82c9f5569","cc93f516-50ff-4376-be37-0682cf9b0671"]
-            }
             
 + Response 201 (application/json)
 
-        {
-            "reference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-            "firstName": "Jamie",
-            "lastName": "Burns",
-            "emailAddress": "jamie.burns@virtual-college.co.uk",
-            "userName": "jb",
-            "createdDate": "2012-04-23T18:25:43.511Z",
-            "additional":
-            [
-                {
-                    "name": "jobTitle",
-                    "value": "Software Architect"
-                },
-                {
-                    "name": "userStartDate",
-                    "value": "01-Jan-2016"
-                }
-            ]
-        }
+        "User Deactivated"
 
 + Response 401
 
-        {
-            "Error description 1",
-            "Error description 2"
-        }
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
 
 + Response 404
 
-## Optional Fields [/users/optionalFields]
-Gets the list of available optional fields
++ Response 409
 
-Returned properties are -
-+ `name` The name of the optional field, in English
-+ `type` The descriptive type of the optional field
+## Set Active [/users/{userIdentifier}/SetActive]
+Set a user as active.
 
-The types available are -
-+ `String` A string
-+ `Number` A number
-+ `Date` A date
-+ `PassedDate` A date in the past
-+ `PositiveNumber` A positive number
-+ `NonLocalisedPassedDate` A date without time, which is in the past
-+ `NonLocalisedDate` A date without time
+### SetActive [POST]
 
-### List [GET]
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
 
 + Request (application/json)
 
@@ -791,22 +665,33 @@ The types available are -
             x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
             x-api-language: en-GB
             
-+ Response 200 (application/json)
+    + Body
+            
++ Response 201 (application/json)
 
-        [
-            {
-                "name": "DateOfBirth",
-                "type": "Unlocalised date in the past",
-            },
-            {
-                "name": "JobTitle",
-                "type": "Text",
-            }
-        ]
+        "User Activated"
 
 + Response 401
 
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
 + Response 404
+
++ Response 409
+
+# Group Users - AD FS Authentication
+
+SSO User related resources of the **Enable API**
+
+**Who can use these endpoints?**
+
+The endpoints in this section can only be used by customers that have Enable configured to authenticate users with:
++ AD FS (SSO)
+
+Customers using **Email Addresses** or **Usernames** authentication will receive a 403 Forbidden error, and the endpoints in the <a href="#reference/users-standard-authentication">Users - Standard Authentication</a> section should be used instead.
+
 
 ## Synchronise Users [/users/SSO]
 Synchronises users from an external source into the LMS.
@@ -869,6 +754,10 @@ If the user does not already exist, it is added.  If they already exist, they ar
 
 + Response 401
 
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
 + Response 404
 
 ## Activate Users [/users/SSO/activate]
@@ -914,6 +803,10 @@ If a user is not found for a specific id, then an error will be returned includi
 
 + Response 401
 
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
 + Response 404
 
 ## Delete Users [/users/SSO/delete]
@@ -954,6 +847,10 @@ The parameters are -
         The request is badly formed, or is missing something required
 
 + Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
 
 + Response 404
 
@@ -1008,65 +905,44 @@ The parameters are -
 
 + Response 401
 
-+ Response 404        
++ Response 403
 
-## Count Users - Current Day [/users/recentCount]
-A count of the number of users added, and who have logged in, since midnight (UTC).
-
-Users who exist in multiple LMSs are counted only once.
-
-### Retrieve recent count [GET]
-+ Request (application/json)
-
-    + Header
-
-            x-api-version: 1.0
-            x-api-nonce: 2147483647
-            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
-            x-api-language: en-GB
-            
-+ Response 200 (application/json)
-
-        { 
-            123
-        }
-        
-+ Response 401
+        This endpoint can only be used for domains configured to use AD FS
 
 + Response 404
 
-## Count Users - Total [/users/count]
-A count of the number of users added, and who have logged in, in total.
+# Group Learn
 
-Users who exist in multiple LMSs are counted only once.
+## Modules [/learn/modules/search]
 
-### Retrieve total count [GET]
-+ Request (application/json)
+List modules that can be shown in a shop.
 
-    + Header
+This will include all modules available to the API's 
+LMS (including self-created modules and licenced modules).
+Includes a free-text search that filters the list of modules.
 
-            x-api-version: 1.0
-            x-api-nonce: 2147483647
-            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
-            x-api-language: en-GB
-            
-+ Response 200 (application/json)
-
-        { 
-            1234
-        }
-        
-+ Response 401
-
-+ Response 404
-
-## Set Inactive [/users/{userIdentifier}/SetInactive]
-Set a user as inactive.
+### Retrieve modules [POST]
 
 The parameters are -
-+ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
++ `search` *(optional)* A free-text search that filters the list of modules based on the name of the module (case insensitive).
++ `pageSize` *(optional, defaults to 12)* The number of items to return for a page
++ `pageNumber` *(optional, defaults to 1)* The requested page.  This number is 1-based (such as the first page is `pageNumber: 1`)
++ `order` *(optional, defaults to AlphaAscending)* The order of the modules.  The available options are -
+    + AlphaAscending
+    + AlphaDescending
+    + DateAscending
+    + DateDescending
 
-### SetInactive [POST]
+Returned properties are -
++ `totalModules` The total number of modules that match the current request, across all pages.  This is an **INT**
++ `modules` An array of modules
++ `modules\moduleReference` The reference of the module.  This is the reference that should be used when informing the LMS of any purchases.  This is a **GUID**
++ `modules\name` This is the name of the module, in English
++ `modules\description` This is the description of the module, in English
++ `modules\publishDate` This is the date and time at which the module was last published.  This date is **UTC**, according to **ISO 8601**.
++ `modules\isPosted` This is whether the module has a posted certificate.  Where an LMS is licenced a posted and non-posted version of the module, the module will appear twice in the list.  This is a **BOOL**
+
+No results will return `totalModules: 0` and an empty array.
 
 + Request (application/json)
 
@@ -1078,24 +954,71 @@ The parameters are -
             x-api-language: en-GB
             
     + Body
-            
-+ Response 201 (application/json)
+        
+            { 
+                "search": "module1", 
+                "pageSize": 24,
+                "pageNumber": 1,
+                "order": "DateDescending"
+            }
+    
++ Response 200 (application/json)
 
-        "User Deactivated"
+        { 
+            "totalModules": 123, 
+            "modules": 
+            [
+                {
+                    "moduleReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "name": "Module1",
+                    "description": "This is module 1",
+                    "publishDate": "2012-04-23T18:25:43.511Z",
+                    "isPosted": false
+                },
+                {
+                    "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "name": "Module2",
+                    "description": "This is module 2",
+                    "publishDate": "2012-04-23T18:25:43.511Z",
+                    "isPosted": false
+                },
+                {
+                    "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "name": "Module2",
+                    "description": "This is module 2",
+                    "publishDate": "2012-04-23T18:25:43.511Z",
+                    "isPosted": true
+                }
+            ]
+        }
 
 + Response 401
 
 + Response 404
 
-+ Response 409
+## User Has Allocation [/learn/modules/userHasAllocation]
+Check if the user has the module allocated.
 
-## Set Active [/users/{userIdentifier}/SetActive]
-Set a user as active.
+**Who can use this endpoint?**
 
-The parameters are -
-+ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
 
-### SetActive [POST]
++ Email Address
++ Username
+
+Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+
+### Check user has allocation [POST]
+
+The parameters are:
++ `emailAddress` *(Required for domains using email address to identify the user)* Email Address of the user that needs to be checked
++ `userName` *(Required for domains using user name to identify the user)* User Name of the user that needs to be checked
++ `moduleReference` *(Required)* The reference of the module.
++ `isPosted`: *(Optional, defaults to false)* This is whether the module has a posted certificate. 
+
+Returned properties are -
++ `allocationUrl` This is empty if the user doesn't exist or hasn't got the allocation. Otherwise returns the url to the module overview page.
++ `hasAllocation` A boolean value to denote if the user has allocation or not.
 
 + Request (application/json)
 
@@ -1107,22 +1030,98 @@ The parameters are -
             x-api-language: en-GB
             
     + Body
+        
+            { 
+                "emailAddress": "xyz@vc.com", 
+                "userName": "xyz",
+                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                "isPosted": false
+            }
+    
++ Response 200 (application/json)
+
+        {
+        "allocationUrl": "https://bedrock-web.devmachine.com/Learn/Learning/LearnerRecord?reference=398e9d7b-e1c7-4ce7-aff8-f6dfcbf45f30",
+        "hasAllocation": true
+        }
+        
++ Response 400
+
+        [
+            "Error description 1",
+            "Error description 2"
+        ]
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
+
+## Allocate To User [/learn/modules/allocateToUser]
+Creates user if doesn't exist and allocates the module irrespective of whether the user already has one or not.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ Email Address
++ Username
+
+Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+
+### Allocate module to user [POST]
+
+The parameters are -
++ `emailAddress` *(Required)* Email Address of the user that needs to be checked
++ `userName` *(Required for domains using user name to identify the user)* User Name of the user that needs to be checked
++ `moduleReference` *(Required)* The reference of the module.
++ `isPosted`: *(Optional, defaults to false)* This is whether the module has a posted certificate. 
+
+Returned properties are -
++ `allocationUrl` Returns the url to take the user to the module overview page.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
             
-+ Response 201 (application/json)
+    + Body
+        
+            { 
+                "emailAddress": "xyz@vc.com", 
+                "userName": "xyz",
+                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                "isPosted": false
+            }
+    
++ Response 200 (application/json)
 
-        "User Activated"
+        {
+        "allocationUrl": "https://bedrock-web.devmachine.com/Learn/Learning/LearnerRecord?reference=398e9d7b-e1c7-4ce7-aff8-f6dfcbf45f30"
+        }
+        
++ Response 400
 
-+ Response 401
+        [
+            "Error description 1",
+            "Error description 2"
+        ]
 
-+ Response 404
++ Response 403
 
-+ Response 409
+        This endpoint cannot be used for domains configured with SSO
 
 # Group Groups
 Group related resources of the **Enable API**
 
 ## Find Groups [/groups/search]
 Gets a list of groups.
+
+### Search [POST]
 
 The parameters are -
 + `search` *(optional)* A free-text search that filters the list of groups based on the name of the group (case insensitive).
@@ -1141,8 +1140,6 @@ Returned properties are -
 + `groups\name` This is the name of the group
 
 No results will return `totalGroups: 0` and an empty array.
-
-### Search [POST]
 
 + Request (application/json)
 
@@ -1187,6 +1184,14 @@ No results will return `totalGroups: 0` and an empty array.
 
 Removes a list of users from a group.
 
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ AD FS (SSO)
+
+Customers using **Email Address** or **Username** authentication will receive a 403 Forbidden error.
+
 ### Remove Users From Group [POST]
 
 The parameters are -
@@ -1228,10 +1233,16 @@ The parameters are -
 
 + Response 401
 
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
 + Response 404 
 
 ## Add Group [/groups]
 Add a group.
+
+### Add [POST]
 
 The parameters are -
 + `name` The name of the group to be created.
@@ -1247,10 +1258,7 @@ The parameters are -
 + `isLineManagementGroup` *(defaults to false)* Allows Line Managers to manage contained members.
 + `allowSelfRegistration` *(defaults to false)* Allows users of this group to register themselves for the LMS
 
-
 A successful request will return a success message alongside the generated group id (GUID).
-
-### Add [POST]
 
 + Request (application/json)
 
@@ -1392,6 +1400,8 @@ Classification related resources of the **Enable API**
 ## Find Classifications [/classifications/search]
 Gets a list of classifications.
 
+### Search [POST]
+
 The parameters are -
 + `search` *(optional)* A free-text search that filters the list of classifications based on the name of the classification (case insensitive).
 + `pageSize` *(optional, defaults to 12)* The number of items to return for a page
@@ -1409,8 +1419,6 @@ Returned properties are -
 + `classifications\name` This is the name of the classification
 
 No results will return `totalClassifications: 0` and an empty array.
-
-### Search [POST]
 
 + Request (application/json)
 
@@ -1449,7 +1457,126 @@ No results will return `totalClassifications: 0` and an empty array.
 
 + Response 401
 
-+ Response 404       
++ Response 404  
+
+# Group Shop
+
+Shop related resources of the **Enable API**
+
+**Who can use these endpoints?**
+
+The endpoints in this section can only be used by customers that have Enable configured to authenticate users with either:
+
++ Email Address
+
++ Username
+
+Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+
+## Purchases [/shop/purchases]
+Records a purchase of modules made by a user outside of the LMS.
+The modules purchased will be attributed to the specified user.
+
+### Add purchases [POST]
+
+The parameters are -
++ `emailAddress` *(Required)* The email address of the user to whom the purchase is to be attributed
++ `userName` *(Required for domains using user name to identify the user)* The user name of the user to whom the purchase is to be attributed
++ `orderNumber` *(Required)* The order number of the purchase.  Can be alpha-numeric, maximum 50 characters
++ `orderDate` *(Required)* The date of the order.  Must be in the **ISO 8601** format
++ `totalAmount` *(Required)* The grand total of the order, including VAT and after any discounts have been applied.  Must be in the currency specified in `currencyCode`, and be a valid currency value
++ `currencyCode` *(Required)* The currency of the totals used in the order.  The code should be a valid **ISO 4217** code.
++ `vatAmount` *(Required)* The total VAT charged for the order.  Must be in the currency specified in `currencyCode`, and be a valid currency value
++ `discountAmount` *(Optional, defaults to 0)* The total amount discounted form the order.  Must be in the currency specified in `currencyCode`, and be a valid currency value
++ `products` *(Required)* The list of products included in the order.  Must contain at least one item
++ `product\name` *(Required)* The name of the product.  Can be alpha-numeric, maximum 255 characters
++ `product\id` *(Required)* The id of the product, as defined by the calling application.  Can be alpha-numberic, maximum 255 characters
++ `product\unitPrice` *(Required)* The price for a purchase of the product with a quantity of 1, before VAT and before any discounts applied.  Must be in the currency specified in `currencyCode`, and be a valid currency value
++ `product\quantity` *(Required)* The quantity of the product in the order.  Must be an **INT**
++ `product\modules` *(Required)* The modules associated with the product.  Must contain at least one item
++ `product\module\moduleReference` *(Required)* The reference of the module.  This is the reference provided by the LMS via the API.  Must be a **GUID**
++ `product\module\quantity` *(Optional, defaults to 1)* The number of modules included in the product.  If no quantity is provided, a default of **1** is used.  Must be an **INT**
++ `product\module\isPosted` *(Optional, defaults to false)* Whether the product should be posted.  Must be a **BOOL**
+
+Returns `201` if the operation was successful, otherwise one of the error codes is returned.  Also returns the URL to which
+the user should be directed.  If the user has been created as part of this call, then this link redirects to the confirmation page
+that the user will complete to confirm their account.
+
++ Request (application/json)
+    + Header
+    
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            { 
+                "emailAddress": "darren.lawson@virtual-college.co.uk", 
+                "userName": "dl", 
+                "orderNumber": "abc123",
+                "orderDate": "2012-04-23T18:25:43.511Z",
+                "totalAmount": 190.12,
+                "currencyCode": "GBP",
+                "vatAmount": 40.00,
+                "discountAmount": 12.34,
+                "products": 
+                [
+                    {
+                        "name": "Product1",
+                        "id": "abc123",
+                        "unitPrice": 12.34,
+                        "quantity": 1,
+                        "modules":
+                        [
+                            {
+                                "moduleReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                                "quantity": 3,
+                                "isPosted": true
+                            },
+                            {
+                                "moduleReference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                                "quantity": 2,
+                                "isPosted": false
+                            },
+                            {
+                                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                                "quantity": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Product2",
+                        "id": "def456",
+                        "unitPrice": 34.21,
+                        "quantity": 1,
+                        "modules":
+                        [
+                            {
+                                "moduleReference": "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                                "quantity": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+
++ Response 201
+
+        https://www.vc-enable.co.uk
+
++ Response 400
+
+        The request is badly formed, or is missing something required
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
 
 # Group User Report
 User reporting related resources of the **Enable API**.
