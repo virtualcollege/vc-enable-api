@@ -322,6 +322,7 @@ The parameters are -
 + `additional\value` *(optional)* The value of the property. Maximum 255 characters.  The type will be dependent on the type of the field itself
 + `groupReferences` *(optional)* An array of Groups (GUIDs) to add the user to. Users are only added to groups via this call, not removed.
 + `lineManagerReferences` *(optional)* An array of Users (GUIDs) to associate as Line Managers for the user. Line Managers are only added to Users via this call, not removed.
++ `sendWelcomeEmail` *(optional)* A boolean indicating whether the welcome email should be sent to the user.  Defaults to true
 
 Returned properties are -
 + `reference` The reference of the user within an LMS.  This is a **GUID**
@@ -642,7 +643,7 @@ The parameters are -
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+        This endpoint cannot be used for domains configured with SSO
 
 + Response 404
 
@@ -675,7 +676,119 @@ The parameters are -
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
++ Response 409
+
+## Resend Welcome Emails [/users/ResendWelcomeEmail]
+Resends welcome emails to specific users.
+
+### ResendWelcomeEmail [POST]
+
+The parameters are -
++ `userIdentifiers` *(required)* An array of exact email addresses (for domains using email to identify users) or user names (for domains using user name to identify users).
+
+Users will only be resent a welcome email if they have either never received a welcome email, or if they have not yet logged in.
+
+If a user has already received a welcome email and they have logged in, they will be ignored during this request.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+    
+            {
+                userIdentifiers:
+                [
+                    "jamie.burns@virtual-college.co.uk",
+                    "darren.lawson@virtual-college.co.uk"
+                ]
+            }
+            
++ Response 200 (application/json)
+
++ Response 400
+            
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
++ Response 409
+
+## Resend Welcome Email [/users/{userIdentifier}/ResendWelcomeEmail]
+Resends welcome emails to a specific user.
+
+### ResendWelcomeEmail [POST]
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
+
+Users will only be resent a welcome email if they have either never received a welcome email, or if they have not yet logged in.
+
+If a user has already received a welcome email and they have logged in, a 400 Bad Request error will be returned.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+            
++ Response 200 (application/json)
+
++ Response 400
+            
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
++ Response 409
+
+## Send Welcome Emails [/users/SendWelcomeEmail]
+Sends welcome emails to all users who have not received one yet.
+
+### SendWelcomeEmail [POST]
+
+Users who have already been sent a welcome email will not receive a second welcome email, even if they haven't logged in yet.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+            
++ Response 200 (application/json)
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
 
 + Response 404
 
@@ -707,7 +820,7 @@ The parameters are -
 + `emailAddress` *(required)* The email address of the user.  Maximum 100 characters
 + `accountName` *(optional)* The account name of the user.  For AD FS SSO, this should be the SamAccountName.  Maximum 100 characters
 + `groupReferences` *(optional)* An array of Groups (GUIDs) to add the user to. Users are only added to groups via this call, not removed.
-+ `lineManagers` *(optional)* An array of Line Manager User Ids (SIDs) to associate with the user. Line Managers are only added to users via this call, not removed.
++ `lineManagers` *(optional)* An array of Line Manager User Ids (SIDs) to associate with the user. Line Managers are only added to users via this call, not removed.  A user cannot be their own direct line manager.
 
 If the user does not already exist, it is added.  If they already exist, they are updated.
   
