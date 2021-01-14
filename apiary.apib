@@ -313,8 +313,8 @@ Creates a new user
 ### Add [POST]
 
 The parameters are -
-+ `emailAddress` *(required)* The user's email address. Maximum 100 characters, and must be of a valid email address format
-+ `userName` *(required for domain using user name to identify the user)* The user's user name. Maximum 100 characters
++ `emailAddress` *(required)* The user's email address. Maximum 100 characters, and must be of a valid email address format. Email address must be unique.
++ `userName` *(required for domain using user name to identify the user)* The user's user name. Maximum 100 characters. User name must be unique. 
 + `firstName` *(required)* The user's first name. Maximum 255 characters
 + `lastName` *(required)* This user's last name. Maximum 255 characters
 + `additional` *(optional)* An array of additional properties, including optional fields
@@ -420,8 +420,8 @@ Returned properties are -
 When updating, only the following properties can be changed -
 + `firstName` *(required)* This can be freely changed. Maximum 255 characters
 + `lastName` *(required)* This can be freely changed. Maximum 255 characters
-+ `emailAddress` *(required)* This can only be changed if the user with the same email address does not exist in other LMSs. Maximum 100 characters
-+ `userName` *(required for domains using user name to identify the user)* This can only be changed if the user with the same user name does not exist in current LMSs. Maximum 100 characters
++ `emailAddress` *(required)* This can only be changed if the user with the same email address does not exist in other LMSs. Maximum 100 characters.  Email address must be unique.
++ `userName` *(required for domains using user name to identify the user)* This can only be changed if the user with the same user name does not exist in current LMSs. Maximum 100 characters. User name must be unique. 
 + `additional` *(optional)* An array of additional properties, including optional fields.  Any fields not provided in the list will remain unchanged when persisted
 + `additional\name` *(required)* The name of the property, in English
 + `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
@@ -681,6 +681,114 @@ The parameters are -
 + Response 404
 
 + Response 409
+
+## Remove User From Groups [/users/{userIdentifier}/RemoveFromGroups]
+
+Removes a user from a list of groups.
+
+### Remove User From Groups [POST]
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
++ `references` *(required)* An array of references for each group the user is intended to be removed from
+
+ Removes the specified user from the groups. Accepts a list of references to identify the groups and an identifier for the target user.
+ 
+ If the user is not found an error will be returned.
+ 
+ If a group is not found for a specific reference, then that reference will be returned in an error.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                "references": 
+                [
+                    "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d"
+                ]
+            }
+            
++ Response 200
+
++ Response 400
+
+        [
+            "Cannot find group: e9f2b0a5-01fd-4138-9451-e25ddaa70a7d"
+        ]
+        
+        OR
+        
+        [
+            "Cannot find user with username1"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+## Remove Line Managers For User [/users/{userIdentifier}/RemoveLineManagersForUser]
+
+Removes line managers for a user
+### Remove Line Managers For A User [POST]
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
++ `references` *(required)* An array of Line Managers' references to be removed from the user
+
+ Removes Line Managers for the user. Accepts a list of references to identify the Line Managers and an identifier for the target user.
+ 
+ If the user is not found an error will be returned.
+ 
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                "references": 
+                [
+                    "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d"
+                ]
+            }
+            
++ Response 200
+
++ Response 400
+        
+        [
+            "Cannot find user with username1"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+
 
 ## Resend Welcome Emails [/users/ResendWelcomeEmail]
 Resends welcome emails to specific users.
@@ -1024,6 +1132,55 @@ The parameters are -
 
 + Response 404
 
+## Remove Line Managers For User [/users/sso/{id}/removeLineManagers]
+
+Removes line managers for a user
+### Remove Line Managers For A User [POST]
+
+The parameters are -
++ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID
++ `references` *(required)* An array of line managers' references to be removed from the user
+
+ Removes line managers for the user. Accepts a list of references to identify the line managers and an id for the target user.
+ 
+ If the user is not found an error will be returned.
+ 
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                "references": 
+                [
+                    "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
+                    "d9f2b0a5-01fd-4138-9451-e25ddaa70a7d"
+                ]
+            }
+            
++ Response 200
+
++ Response 400
+        
+        [
+            "Cannot find user: S-1-5-21-2527162006-4105834857-2401098550-2613"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
 # Group Learn
 
 ## Modules [/learn/modules/search]
@@ -1251,6 +1408,7 @@ Returned properties are -
 + `groups` An array of groups
 + `groups\reference` The reference of the group within an LMS.  This is a **GUID**
 + `groups\name` This is the name of the group
++ `groups\classifications` This is the comma separated classification names
 
 No results will return `totalGroups: 0` and an empty array.
 
@@ -1280,11 +1438,13 @@ No results will return `totalGroups: 0` and an empty array.
             [
                 {
                     "reference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                    "name": "Group 1"
+                    "name": "Group 1",
+                    "classifications": "Community, Academy"
                 },
                 {
                     "reference": "e9f2b0a5-01fd-4138-9451-e25ddaa70a7d",
-                    "name": "Group 12
+                    "name": "Group 12,
+                    "classifications": ""
                 }
             ]
         }
