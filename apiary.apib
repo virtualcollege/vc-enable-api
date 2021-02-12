@@ -133,6 +133,7 @@ Returned properties are -
 + `users\emailAddress` This is the email address of the user
 + `users\userName` This is the user name of the user
 + `users\createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
++ `users\isInactive` A boolean value to denote if the user is inactive or not
 + `users\providerUserKey` This is the security identifier of the ADFS user (only applicable for SSO AD domains)
 + `users\additional` An array of additional properties, including optional fields
 + `users\additional\name` The name of the property, in English
@@ -171,6 +172,7 @@ No results will return `totalUsers: 0` and an empty array.
                     "userName": "jamie.burns@virtual-college.co.uk",
                     "emailAddress": "jamie.burns@virtual-college.co.uk",
                     "createdDate": "2012-04-23T18:25:43.511Z",
+                    "isInactive": false
                     "providerUserKey":"",
                     "additional":
                     [
@@ -191,6 +193,7 @@ No results will return `totalUsers: 0` and an empty array.
                     "userName": "alex.woodhead@virtual-college.co.uk",
                     "emailAddress": "alex.woodhead@virtual-college.co.uk",
                     "createdDate": "2013-04-23T18:25:43.511Z",
+                    "isInactive": true
                     "providerUserKey":"",
                     "additional": []
                 }
@@ -400,7 +403,7 @@ Returned properties are -
 + Response 404
 
 ## Manage User Details [/users/{userIdentifier}]
-Gets or updates the details of a specific user.
+Gets or updates the details of a specific user. It does not change the status of the user.
 
 The parameters are -
 + `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
@@ -412,6 +415,7 @@ Returned properties are -
 + `emailAddress` This is the email address of the user
 + `userName` This is the user name of the user
 + `createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
++ `users\isInactive` A boolean value to denote if the user is inactive or not
 + `additional` An array of optional fields
 + `additional\name` The name of the property, in English
 + `additional\value` The value of the property.  The type will be dependent on the type of the field itself
@@ -453,6 +457,7 @@ When patching, only the following properties can be changed -
             "userName": "jamie.burns@virtual-college.co.uk",
             "emailAddress": "jamie.burns@virtual-college.co.uk",
             "createdDate": "2012-04-23T18:25:43.511Z",
+            "isInactive" : false,
             "additional":
             [
                 {
@@ -514,6 +519,7 @@ When patching, only the following properties can be changed -
             "emailAddress": "jamie.burns@virtual-college.co.uk",
             "userName": "jamie.burns@virtual-college.co.uk",
             "createdDate": "2012-04-23T18:25:43.511Z",
+            "isInactive": true,
             "additional":
             [
                 {
@@ -568,6 +574,7 @@ When patching, only the following properties can be changed -
             "emailAddress": "jamie.burns@virtual-college.co.uk",
             "userName": "jamie.burns@virtual-college.co.uk",
             "createdDate": "2012-04-23T18:25:43.511Z",
+            "isInactive": true,
             "additional":
             [
                 {
