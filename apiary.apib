@@ -1459,9 +1459,9 @@ No results will return `totalGroups: 0` and an empty array.
 
 + Response 404
 
-## Remove Users From Group [/groups/{groupReference}/sso/removeusers]
+## Remove SSO Users From Group [/groups/{groupReference}/sso/removeusers]
 
-Removes a list of users from a group.
+Removes a list of sso users from a group.
 
 **Who can use this endpoint?**
 
@@ -1469,15 +1469,15 @@ This endpoint can only be used by customers that have Enable configured to authe
 
 + AD FS (SSO)
 
-Customers using **Email Address** or **Username** authentication will receive a 403 Forbidden error.
+Customers using **Email Address** or **Username** authentication will receive a 403 Forbidden error. They should be using the non sso version of the method given in the documentation.
 
-### Remove Users From Group [POST]
+### Remove SSO Users From Group [POST]
 
 The parameters are -
 + `groupReference` *(required)* The reference of the group.
-+ `Ids` *(required)* An array of id's for each user intended to be removed from the group. For AD FS SSO, this should be the SID
++ `Ids` *(required)* An array of id's for each user intended to be removed from the group. As this is for AD FS SSO, the id should be the SID
 
- Removes the specified users from the group. Accepts a list of id's to identify the users and a reference for the target group.
+ Removes the specified users from the group. Accepts a list of ids to identify the users and a reference for the target group.
  
  If the group reference is not a valid reference, an error will be returned.
  
@@ -1515,6 +1515,63 @@ The parameters are -
 + Response 403
 
         This endpoint can only be used for domains configured to use AD FS
+
++ Response 404 
+
+## Remove Users From Group [/groups/{groupReference}/removeusers]
+
+Removes a list of users from a group.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### Remove Users From Group [POST]
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group.
++ `UserIdentifiers` *(required)* An array of user identifiers that is used to login for each user intended to be removed from the group.
+
+ Removes the specified users from the group. Accepts a list of email addressess or user names depending on how the customer has Enable configured to identify the users and a reference for the target group.
+ 
+ If the group reference is not a valid reference, an error will be returned.
+ 
+ If a user is not found for a specific identifier, then that identifier will be returned in an error.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                userIdentifers:
+                [
+                    "testuser1@abc.com",
+                    "testuser2@abc.com"
+                ]
+            }
+            
++ Response 200
+
++ Response 400
+
+        [
+            "Cannot find user: testuser2@abc.com"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can not be used for AD FS domains
 
 + Response 404 
 
