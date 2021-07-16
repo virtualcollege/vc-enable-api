@@ -937,6 +937,8 @@ The parameters are -
 + `lineManagers` *(optional)* An array of Line Manager User Ids (SIDs) to associate with the user. Line Managers are only added to users via this call, not removed.  A user cannot be their own direct line manager.
 
 If the user does not already exist, it is added.  If they already exist, they are updated.
+
+Note: The system enforces uniqueness in the email address used and hence if the request for a new user has an email address, that is already used in the domain, an error message is returned.
   
 + Request (application/json)
 
