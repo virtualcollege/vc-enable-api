@@ -745,6 +745,327 @@ The parameters are -
 
 + Response 404
 
+## Groups [/users/{userIdentifier}/groups]
+
+Manages multiple groups for a user.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### List Groups For User [GET]
+
+Returns the list of groups for the user, including their member role.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user. This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            "groups":
+            [
+                {
+                    groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                    role: "admin"
+                },
+                {
+                    groupReference: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404 
+
+        Cannot find user
+
+### Add Groups To User [PUT]
+
+Adds or updates the groups for a user. If no role is specified for a group member, then the member will be added with the 'user' role (no role change is made if the group member already exists).
+
+If the user already exists in any of the groups, then the member's role is updated.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user
++ `groups` *(required)* An array of groups that is used to identify which groups are to be added for the user
++ `groups\groupReference` *(required)* The reference of the group
++ `groups\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+
+If a group reference is not found, or if it is not a valid reference, then that reference will be returned in an error and no group members will be added.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+
+If a group member already exists, and no role is specified in the request, then the group member's role is not changed.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                groups:
+                [
+                    {
+                        groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                        role: "admin"
+                    },
+                    {
+                        groupReference: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                        role: "user"
+                    }
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "groups":
+            [
+                {
+                    groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                    role: "admin"
+                },
+                {
+                    userIdentifier: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        [
+            "Cannot find group: 55e19dcf-751c-423a-9781-1ab72d9083d3"
+        ]
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 400
+
+        [
+            "GroupReference is required"
+        ]
+
++ Response 400
+
+        [
+            "Invalid group reference: NOT-A-GUID"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find user
+
+## Group Member [/users/{userIdentifier}/groups/{groupReference}]
+
+Manages a single user within a group.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### Get Group Member [GET]
+
+Returns the details of a group member, including their member role.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+### Update Group Member [PUT]
+
+Adds (or updates) a single group member, including setting the group member's role. If no role is specified for a group member, then the member will be added with the 'user' role.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
++ `groupReference` *(required)* The reference of the group
++ `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+ 
+If the user already exists in the group, then the user's membership type will be updated if a role is specified.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                role: "admin"
+            }
+            
++ Response 200 (application/json)
+
+        {
+            groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
+### Delete Group Member [DELETE]
+
+Removes a user from a group.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If the user has already been removed from the group (or has never been added to the group) then no change is made.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 204
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
 ## Remove Line Managers For User [/users/{userIdentifier}/RemoveLineManagersForUser]
 
 Removes line managers for a user
@@ -1140,6 +1461,328 @@ The parameters are -
 
 + Response 404
 
+## Groups [/users/sso/{id}/groups]
+
+Manages multiple groups for a user.
+
+**Who can use these endpoints?**
+
+The endpoints in this section can only be used by customers that have Enable configured to authenticate users with:
++ AD FS (SSO)
+
+Customers using **Email Addresses** or **Usernames** authentication will receive a 403 Forbidden error, and the endpoints in the <a href="#reference/users-standard-authentication">Users - Standard Authentication</a> section should be used instead.
+
+### List Groups For User [GET]
+
+Returns the list of groups for the user, including their member role.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            "groups":
+            [
+                {
+                    groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                    role: "admin"
+                },
+                {
+                    groupReference: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404 
+
+        Cannot find user
+
+### Add Groups To User [PUT]
+
+Adds or updates the groups for a user. If no role is specified for a group member, then the member will be added with the 'user' role (no role change is made if the group member already exists).
+
+If the user already exists in any of the groups, then the member's role is updated.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `groups` *(required)* An array of groups that is used to identify which groups are to be added for the user
++ `groups\groupReference` *(required)* The reference of the group
++ `groups\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+
+If a group reference is not found, or if it is not a valid reference, then that reference will be returned in an error and no group members will be added.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+
+If a group member already exists, and no role is specified in the request, then the group member's role is not changed.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                groups:
+                [
+                    {
+                        groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                        role: "admin"
+                    },
+                    {
+                        groupReference: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                        role: "user"
+                    }
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "groups":
+            [
+                {
+                    groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                    role: "admin"
+                },
+                {
+                    userIdentifier: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        [
+            "Cannot find group: 55e19dcf-751c-423a-9781-1ab72d9083d3"
+        ]
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 400
+
+        [
+            "GroupReference is required"
+        ]
+
++ Response 400
+
+        [
+            "Invalid group reference: NOT-A-GUID"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find user
+
+## Group Member [/users/sso/{id}/groups/{groupReference}]
+
+Manages a single user within a group.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### Get Group Member [GET]
+
+Returns the details of a group member, including their member role.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+### Update Group Member [PUT]
+
+Adds (or updates) a single group member, including setting the group member's role. If no role is specified for a group member, then the member will be added with the 'user' role.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `groupReference` *(required)* The reference of the group
++ `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+ 
+If the user already exists in the group, then the user's membership type will be updated if a role is specified.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                role: "admin"
+            }
+            
++ Response 200 (application/json)
+
+        {
+            groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
+### Delete Group Member [DELETE]
+
+Removes a user from a group.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If the user has already been removed from the group (or has never been added to the group) then no change is made.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 204
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
 ## Remove Line Managers For User [/users/sso/{id}/removeLineManagers]
 
 Removes line managers for a user
@@ -1393,6 +2036,684 @@ Returned properties are -
 
         This endpoint cannot be used for domains configured with SSO
 
+## Allocations For Users [/learn/modules/{moduleReference}/users]
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ Email Address
++ Username
+
+Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+
+### Get Allocations For Users [GET]
+
+Gets the list of allocations for the module for users
+
+The parameters are -
++ `moduleReference` The reference of the module
++ `groupReference` *(optional, defaults to none)* The reference of the group
++ `isPosted` *(optional, defaults to false)* Whether the module identified is the posted certificate version
+
+Returned properties are -
++ `users` The array of users that have an allocation for this module
++ `users\userIdentifier` The identifier of the user
++ `users\allocations` The allocations for the user
++ `users\allocations\moduleReference` The reference of the module
++ `users\allocations\userIdentifier`The identifier of the user
++ `users\allocations\groupReference` The reference of the group
++ `users\allocations\isPosted` Whether the module is the posted certificate version
++ `users\allocations\allocationReference` The reference of the allocation
++ `users\allocations\learnerUrl` The learner's URL of the allocation
++ `users\allocations\adminUrl` The administration URL of the allocation
++ `users\allocations\allocationDate` The start date of the allocation
++ `users\allocations\completedDate` The date when the allocation was completed
++ `users\allocations\onlyAssessmentsMandatory` Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `users\allocations\progressStatus` The progress status of the allocation. Valid options are NotAttempted, InProgress, Completed
++ `users\allocations\contentStatus` The completion status of the allocation. Valid options are Incomplete, Passed, Failed
++ `users\allocations\isAwaitingLicence` Whether the allocation is awaiting a new licence to be made available before it can be started
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+   
++ Response 200 (application/json)
+
+        {
+          "users": [
+            {
+              "userIdentifier": "user@example.com",
+              "allocations": [
+                {
+                  "moduleReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "userIdentifier": "user@example.com",
+                  "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+                  "isPosted": true,
+                  "allocationReference": "039a7ecc-f18f-4a1a-9ade-08e4df69c6e8",
+                  "learnerUrl": "https://example.com",
+                  "adminUrl": "https://example.com",
+                  "allocationDate": "2021-04-23T18:25:43.511Z",
+                  "completedDate": "2021-04-24T18:25:43.511Z",
+                  "onlyAssessmentsMandatory": true,
+                  "progressStatus": "Completed",
+                  "contentStatus": "Passed",
+                  "isAwaitingLicence": false
+                }
+              ]
+            }
+          ]
+        }
+
++ Response 400
+
+        Module reference is not a valid reference/Group reference is not a valid reference/IsPosted is not a valid bool
+        
++ Response 401
+        
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find module/Cannot find group
+        
+## Allocations For User [/learn/modules/{moduleReference}/users/{userIdentifier}/allocations]
+
+Manages the allocations for a user for a specific module.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ Email Address
++ Username
+
+Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+
+### List [GET]
+
+Gets the list of allocations for the module for the user.
+
+The parameters are -
++ `moduleReference` The reference of the module
++ `userIdentifier` The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user
++ `groupReference` *(optional, defaults to none)* The reference of the group
++ `isPosted` *(optional, defaults to false)* Whether the module identified is the posted certificate version
+
+Returned properties are -
++ `allocations` The allocations for the user
++ `allocations\moduleReference` The reference of the module
++ `allocations\userIdentifier`The identifier of the user
++ `allocations\groupReference` The reference of the group
++ `allocations\isPosted` Whether the module is the posted certificate version
++ `allocations\allocationReference` The reference of the allocation
++ `allocations\learnerUrl` The learner's URL of the allocation
++ `allocations\adminUrl` The administration URL of the allocation
++ `allocations\allocationDate` The start date of the allocation
++ `allocations\completedDate` The date when the allocation was completed
++ `allocations\onlyAssessmentsMandatory` Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `allocations\progressStatus` The progress status of the allocation. Valid options are NotAttempted, InProgress, Completed
++ `allocations\contentStatus` The completion status of the allocation. Valid options are Incomplete, Passed, Failed
++ `allocations\isAwaitingLicence` Whether the allocation is awaiting a new licence to be made available before it can be started
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+   
++ Response 200 (application/json)
+
+        {
+          "allocations": [
+            {
+              "moduleReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "userIdentifier": "user@example.com",
+              "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+              "isPosted": true,
+              "allocationReference": "039a7ecc-f18f-4a1a-9ade-08e4df69c6e8",
+              "learnerUrl": "https://example.com",
+              "adminUrl": "https://example.com",
+              "allocationDate": "2021-04-23T18:25:43.511Z",
+              "completedDate": "2021-04-24T18:25:43.511Z",
+              "onlyAssessmentsMandatory": true,
+              "progressStatus": "Completed",
+              "contentStatus": "Passed",
+              "isAwaitingLicence": false
+            }
+          ]
+        }
+
++ Response 400
+
+        Module reference is not a valid reference/User identifier is required/Group reference is not a valid reference/IsPosted is not a valid bool
+        
++ Response 401
+        
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find module/Cannot find user/Cannot find group
+        
+### Add [POST]
+
+Adds a new allocation to the user.
+
+The parameters are -
++ `moduleReference` The reference of the module
++ `userIdentifier` The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user
++ `groupReference` *(optional, defaults to none)* The reference of the group
++ `isPosted` *(optional, defaults to false)* Whether the module is the posted certificate version
++ `allocationDate` *(optional, defaults to current date/time)* The date when the allocation is to be made available to the user
++ `onlyAssessmentsMandatory` *(optional, defaults to false)* Whether the user only needs to complete the allocation's assessments in order to complete the allocation
+
+Returned properties are -
++ `moduleReference` The reference of the module
++ `userIdentifier`The identifier of the user
++ `groupReference` The reference of the group
++ `isPosted` Whether the module is the posted certificate version
++ `allocationReference` The reference of the allocation
++ `learnerUrl` The learner's URL of the allocation
++ `adminUrl` The administration URL of the allocation
++ `allocationDate` The start date of the allocation
++ `completedDate` The date when the allocation was completed
++ `onlyAssessmentsMandatory` Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `progressStatus` The progress status of the allocation. Valid options are NotAttempted, InProgress, Completed
++ `contentStatus` The completion status of the allocation. Valid options are Incomplete, Passed, Failed
++ `isAwaitingLicence` Whether the allocation is awaiting a new licence to be made available before it can be started
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+    
+            {
+              "allocationDate": "2021-04-23T18:25:43.511Z",
+              "onlyAssessmentsMandatory": true,
+              "isPosted": true
+            }
+   
++ Response 200 (application/json)
+
+        {
+          "moduleReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "userIdentifier": "user@example.com",
+          "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+          "isPosted": true,
+          "allocationReference": "039a7ecc-f18f-4a1a-9ade-08e4df69c6e8",
+          "learnerUrl": "https://example.com",
+          "adminUrl": "https://example.com",
+          "allocationDate": "2021-04-23T18:25:43.511Z",
+          "completedDate": "2021-04-24T18:25:43.511Z",
+          "onlyAssessmentsMandatory": true,
+          "progressStatus": "Completed",
+          "contentStatus": "Passed",
+          "isAwaitingLicence": false
+        }
+
++ Response 400
+
+        Module reference is not a valid reference/User identifier is required/Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "AllocationDate is not a valid date",
+            "OnlyAssessmentsMandatory is not a valid bool",
+            "IsPosted is not a valid bool"
+        ]
+        
++ Response 401
+        
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find module/Cannot find user/Cannot find group
+
+## Allocations For SSO Users [/learn/modules/{moduleReference}/users/sso]
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ AD FS (SSO)
+
+Customers using **Email Address** or **Username** authentication will receive a 403 Forbidden error. They should be using the non-SSO version of the method given in the documentation.
+
+### Get Allocations For SSO Users [GET]
+
+Gets the list of allocations for the module for SSO users.
+
+The parameters are -
++ `moduleReference` The reference of the module
++ `groupReference` *(optional, defaults to none)* The reference of the group
++ `isPosted` *(optional, defaults to false)* Whether the module identified is the posted certificate version
+
+Returned properties are -
++ `users` The array of users that have an allocation for this module
++ `users\id` The identifier of the user
++ `users\allocations` The allocations for the user
++ `users\allocations\moduleReference` The reference of the module
++ `users\allocations\userIdentifier`The identifier of the user
++ `users\allocations\groupReference` The reference of the group
++ `users\allocations\isPosted` Whether the module is the posted certificate version
++ `users\allocations\allocationReference` The reference of the allocation
++ `users\allocations\learnerUrl` The learner's URL of the allocation
++ `users\allocations\adminUrl` The administration URL of the allocation
++ `users\allocations\allocationDate` The start date of the allocation
++ `users\allocations\completedDate` The date when the allocation was completed
++ `users\allocations\onlyAssessmentsMandatory` Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `users\allocations\progressStatus` The progress status of the allocation. Valid options are NotAttempted, InProgress, Completed
++ `users\allocations\contentStatus` The completion status of the allocation. Valid options are Incomplete, Passed, Failed
++ `users\allocations\isAwaitingLicence` Whether the allocation is awaiting a new licence to be made available before it can be started
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+   
++ Response 200 (application/json)
+
+        {
+          "users": [
+            {
+              "id": "user@example.com",
+              "allocations": [
+                {
+                  "moduleReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "userIdentifier": "user@example.com",
+                  "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+                  "isPosted": true,
+                  "allocationReference": "039a7ecc-f18f-4a1a-9ade-08e4df69c6e8",
+                  "learnerUrl": "https://example.com",
+                  "adminUrl": "https://example.com",
+                  "allocationDate": "2021-04-23T18:25:43.511Z",
+                  "completedDate": "2021-04-24T18:25:43.511Z",
+                  "onlyAssessmentsMandatory": true,
+                  "progressStatus": "Completed",
+                  "contentStatus": "Passed",
+                  "isAwaitingLicence": false
+                }
+              ]
+            }
+          ]
+        }
+
++ Response 400
+
+        Module reference is not a valid reference/Group reference is not a valid reference/IsPosted is not a valid bool
+        
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find module/Cannot find group
+        
+  
+## Allocations For SSO User [/learn/modules/{moduleReference}/users/sso/{id}/allocations]
+
+Manages the allocations for an SSO user for a specific module.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ AD FS (SSO)
+
+Customers using **Email Address** or **Username** authentication will receive a 403 Forbidden error. They should be using the non-SSO version of the method given in the documentation.
+
+### List [GET]
+
+Gets the list of allocations for the module for the user.
+
+The parameters are -
++ `moduleReference` The reference of the module
++ `id` The id of the user. For AD FS SSO, this should be the SID
++ `groupReference` *(optional, defaults to none)* The reference of the group
++ `isPosted` *(optional, defaults to false)* Whether the module identified is the posted certificate version
+
+Returned properties are -
++ `allocations` The allocations for the user
++ `allocations\moduleReference` The reference of the module
++ `allocations\userIdentifier`The identifier of the user
++ `allocations\groupReference` The reference of the group
++ `allocations\isPosted` Whether the module is the posted certificate version
++ `allocations\allocationReference` The reference of the allocation
++ `allocations\learnerUrl` The learner's URL of the allocation
++ `allocations\adminUrl` The administration URL of the allocation
++ `allocations\allocationDate` The start date of the allocation
++ `allocations\completedDate` The date when the allocation was completed
++ `allocations\onlyAssessmentsMandatory` Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `allocations\progressStatus` The progress status of the allocation. Valid options are NotAttempted, InProgress, Completed
++ `allocations\contentStatus` The completion status of the allocation. Valid options are Incomplete, Passed, Failed
++ `allocations\isAwaitingLicence` Whether the allocation is awaiting a new licence to be made available before it can be started
+
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+   
++ Response 200 (application/json)
+
+        {
+          "allocations": [
+            {
+              "moduleReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "userIdentifier": "user@example.com",
+              "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+              "isPosted": true,
+              "allocationReference": "039a7ecc-f18f-4a1a-9ade-08e4df69c6e8",
+              "learnerUrl": "https://example.com",
+              "adminUrl": "https://example.com",
+              "allocationDate": "2021-04-23T18:25:43.511Z",
+              "completedDate": "2021-04-24T18:25:43.511Z",
+              "onlyAssessmentsMandatory": true,
+              "progressStatus": "Completed",
+              "contentStatus": "Passed",
+              "isAwaitingLicence": false
+            }
+          ]
+        }
+
++ Response 400
+
+        Module reference is not a valid reference/User identifier is required/Group reference is not a valid reference/IsPosted is not a valid bool
+        
++ Response 401
+        
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find module/Cannot find user/Cannot find group
+        
+### Add [POST]
+
+Adds a new allocation to the user.
+
+The parameters are -
++ `moduleReference` The reference of the module
++ `id` The id of the user. For AD FS SSO, this should be the SID
++ `groupReference` *(optional, defaults to none)* The reference of the group
++ `isPosted` *(optional, defaults to false)* Whether the module is the posted certificate version
++ `allocationDate` *(optional, defaults to current date/time)* The date when the allocation is to be made available to the user
++ `onlyAssessmentsMandatory` *(optional, defaults to false)* Whether the user only needs to complete the allocation's assessments in order to complete the allocation
+
+Returned properties are -
++ `moduleReference` The reference of the module
++ `userIdentifier`The identifier of the user
++ `groupReference` The reference of the group
++ `isPosted` Whether the module is the posted certificate version
++ `allocationReference` The reference of the allocation
++ `learnerUrl` The learner's URL of the allocation
++ `adminUrl` The administration URL of the allocation
++ `allocationDate` The start date of the allocation
++ `completedDate` The date when the allocation was completed
++ `onlyAssessmentsMandatory` Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `progressStatus` The progress status of the allocation. Valid options are NotAttempted, InProgress, Completed
++ `contentStatus` The completion status of the allocation. Valid options are Incomplete, Passed, Failed
++ `isAwaitingLicence` Whether the allocation is awaiting a new licence to be made available before it can be started
+
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+    
+            {
+              "allocationDate": "2021-04-23T18:25:43.511Z",
+              "onlyAssessmentsMandatory": true,
+              "isPosted": true
+            }
+   
++ Response 200 (application/json)
+
+        {
+          "moduleReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "userIdentifier": "user@example.com",
+          "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+          "isPosted": true,
+          "allocationReference": "039a7ecc-f18f-4a1a-9ade-08e4df69c6e8",
+          "learnerUrl": "https://example.com",
+          "adminUrl": "https://example.com",
+          "allocationDate": "2021-04-23T18:25:43.511Z",
+          "completedDate": "2021-04-24T18:25:43.511Z",
+          "onlyAssessmentsMandatory": true,
+          "progressStatus": "Completed",
+          "contentStatus": "Passed",
+          "isAwaitingLicence": false
+        }
+
++ Response 400
+
+        Module reference is not a valid reference/User identifier is required/Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "AllocationDate is not a valid date",
+            "OnlyAssessmentsMandatory is not a valid bool",
+            "IsPosted is not a valid bool"
+        ]
+        
++ Response 401
+        
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find module/Cannot find user/Cannot find group
+        
+        
+## Module Allocations [/learn/modules/allocations/{allocationReference}]
+
+Manages module allocations.
+
+### Get [GET]
+
+Gets the allocation for the user.
+
+The parameters are -
++ `allocationReference` The reference of the allocation
+
+Returned properties are -
++ `moduleReference` The reference of the module
++ `userIdentifier`The identifier of the user
++ `groupReference` The reference of the group
++ `isPosted` Whether the module is the posted certificate version
++ `allocationReference` The reference of the allocation
++ `learnerUrl` The learner's URL of the allocation
++ `adminUrl` The administration URL of the allocation
++ `allocationDate` The start date of the allocation
++ `completedDate` The date when the allocation was completed
++ `onlyAssessmentsMandatory` Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `progressStatus` The progress status of the allocation. Valid options are NotAttempted, InProgress, Completed
++ `contentStatus` The completion status of the allocation. Valid options are Incomplete, Passed, Failed
++ `isAwaitingLicence` Whether the allocation is awaiting a new licence to be made available before it can be started
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+   
++ Response 200 (application/json)
+
+        {
+          "moduleReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "userIdentifier": "user@example.com",
+          "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+          "isPosted": true,
+          "allocationReference": "039a7ecc-f18f-4a1a-9ade-08e4df69c6e8",
+          "learnerUrl": "https://example.com",
+          "adminUrl": "https://example.com",
+          "allocationDate": "2021-04-23T18:25:43.511Z",
+          "completedDate": "2021-04-24T18:25:43.511Z",
+          "onlyAssessmentsMandatory": true,
+          "progressStatus": "Completed",
+          "contentStatus": "Passed",
+          "isAwaitingLicence": false
+        }
+
++ Response 400
+
+        Allocation reference is not a valid reference
+        
++ Response 401
+
++ Response 404
+
+        Cannot find allocation
+
+### Update [PATCH]
+
+Updates the allocation.
+
+The parameters are -
++ `allocationReference` The reference of the allocation
++ `allocationDate` *(optional, defaults to current date/time)* The date when the allocation is to be made available to the user
+
+Returned properties are -
++ `moduleReference` The reference of the module
++ `userIdentifier`The identifier of the user
++ `groupReference` The reference of the group
++ `isPosted` Whether the module is the posted certificate version
++ `allocationReference` The reference of the allocation
++ `learnerUrl` The learner's URL of the allocation
++ `adminUrl` The administration URL of the allocation
++ `allocationDate` The start date of the allocation
++ `completedDate` The date when the allocation was completed
++ `onlyAssessmentsMandatory` Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `progressStatus` The progress status of the allocation. Valid options are NotAttempted, InProgress, Completed
++ `contentStatus` The completion status of the allocation. Valid options are Incomplete, Passed, Failed
++ `isAwaitingLicence` Whether the allocation is awaiting a new licence to be made available before it can be started
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+    
+            {
+                "allocationDate": "2021-04-23T18:25:43.511Z"
+            }
+   
++ Response 200 (application/json)
+
+        {
+          "moduleReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "userIdentifier": "user@example.com",
+          "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+          "isPosted": true,
+          "allocationReference": "039a7ecc-f18f-4a1a-9ade-08e4df69c6e8",
+          "learnerUrl": "https://example.com",
+          "adminUrl": "https://example.com",
+          "allocationDate": "2021-04-23T18:25:43.511Z",
+          "completedDate": "2021-04-24T18:25:43.511Z",
+          "onlyAssessmentsMandatory": true,
+          "progressStatus": "Completed",
+          "contentStatus": "Passed",
+          "isAwaitingLicence": false
+        }
+
++ Response 400
+
+        Allocation reference is not a valid reference
+
++ Response 400
+
+        [
+            "AllocationDate is not a valid date",
+            "Allocations that have been started cannot be updated"
+        ]
+        
++ Response 401
+
++ Response 404
+
+        Cannot find allocation
+
+### Delete [DELETE]
+
+Updates the allocation.
+
+The parameters are -
++ `allocationReference` The reference of the allocation
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+   
++ Response 204
+
++ Response 400
+
+        Allocation reference is not a valid reference
+        
++ Response 401
+
++ Response 404
+
+        Cannot find allocation
+        
 # Group Groups
 Group related resources of the **Enable API**
 
@@ -1460,6 +2781,653 @@ No results will return `totalGroups: 0` and an empty array.
 + Response 401
 
 + Response 404
+
+## Members - Standard Authentication [/groups/{groupReference}/users]
+
+Manages multiple users within a group, for domains using standard authentication.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### List Users In Group [GET]
+
+Returns the list of users within the group, including their member type.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            "members":
+            [
+                {
+                    userIdentifier: "testuser1@abc.com",
+                    role: "admin"
+                },
+                {
+                    userIdentifier: "testuser2@abc.com",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404 
+
+        Cannot find group
+
+### Add Users To Group [PUT]
+
+Adds or updates the specified users in the group. Accepts a list of email addressess or user names (depending on how the customer has Enable configured to identify the users) and a reference for the target group.
+
+If any of the specified users already exist in the group, then the member's role is updated.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `members` *(required)* An array of users that is used to identify which users are to be added to the group
++ `members\userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user to add
++ `members\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If a user is not found for a specific identifier, then that identifier will be returned in an error and no users will be added.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+
+If a group member already exists, and no role is specified in the request, then the group member's role is not changed.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                members:
+                [
+                    {
+                        userIdentifier: "testuser1@abc.com",
+                        role: "admin"
+                    },
+                    {
+                        userIdentifier: "testuser2@abc.com",
+                        role: "user"
+                    }
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "members":
+            [
+                {
+                    userIdentifier: "testuser1@abc.com",
+                    role: "admin"
+                },
+                {
+                    userIdentifier: "testuser2@abc.com",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Cannot find user: testuser2@abc.com"
+        ]
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 400
+
+        [
+            "User Identifier is required"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
+## Member - Standard Authentication [/groups/{groupReference}/users/{userIdentifier}]
+
+Manages a single user within a group, for domains using standard authentication.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### Get Group Member [GET]
+
+Returns the details of a group member.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            userIdentifier: "testuser1@abc.com",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+### Update Group Member [PUT]
+
+Adds (or updates) a single group member, including setting the group member's type.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
++ `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+ 
+If the user already exists in the group, then the user's membership type will be updated if a role is specified.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                role: "admin"
+            }
+            
++ Response 200
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
+### Delete Group Member [DELETE]
+
+Removes a user from a group.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If the user has already been removed from the group (or has never been added to the group) then no change is made.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 204
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+## Members - AD FS Authentication [/groups/{groupReference}/users/sso]
+
+Manages multiple users within a group, for domains using AD FS authentication.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ AD FS (SSO)
+
+### List Users In Group [GET]
+
+Returns the list of users within the group, including their member type.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            "members":
+            [
+                {
+                    id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+                    role: "admin"
+                },
+                {
+                    id: "S-1-5-21-2527162006-4105834857-2401098550-2614",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
+### Add SSO Users To Group [PUT]
+
+Adds or updates the specified users in the group. Accepts a list of the SID of the user and a reference for the target group.
+
+If any of the specified users already exist in the group, then the member's role is updated.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `members` *(required)* An array of users that is used to identify which users are to be added to the group
++ `members\id` *(required)* The SID of the user to add
++ `members\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If a user is not found for a specific identifier, then that identifier will be returned in an error and no users will be added.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+
+If a group member already exists, and no role is specified in the request, then the group member's role is not changed.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                members:
+                [
+                    {
+                        id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+                        role: "admin"
+                    },
+                    {
+                        id: "S-1-5-21-2527162006-4105834857-2401098550-2614",
+                        role: "user"
+                    }
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "members":
+            [
+                {
+                    id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+                    role: "admin"
+                },
+                {
+                    id: "S-1-5-21-2527162006-4105834857-2401098550-2614",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        [
+            "Cannot find user: S-1-5-21-2527162006-4105834857-2401098550-2613"
+        ]
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 400
+
+        [
+            "id is required"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        [
+            "Cannot find group"
+        ]
+
+## Member - AD FS Authentication [/groups/{groupReference}/users/sso/{id}]
+
+Manages a single user within a group, for domains using AD FS authentication.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ AD FS (SSO)
+
+### Get Group Member [GET]
+
+Returns the details of a group member.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+### Update Group Member [PUT]
+
+Adds (or updates) a single group member, including setting the group member's role. If no role is specified for a group member, then the member will be added with the 'user' role (no role change is made if the group member already exists).
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+ 
+If the user already exists in the group, then the user's membership type will be updated if a role is specified.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                role: "admin"
+            }
+            
++ Response 200 (application/json)
+
+        {
+            id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
+### Delete Group Member [DELETE]
+
+Removes a user from a group.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If the user has already been removed from the group (or has never been added to the group) then no change is made.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 204
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
 
 ## Remove SSO Users From Group [/groups/{groupReference}/sso/removeusers]
 
@@ -1730,8 +3698,539 @@ A successful request will return a success message alongside the updated group i
 
 + Response 401
 
-+ Response 404   
++ Response 404  
 
+
+## Group Modules [/groups/{groupReference}/modules]
+Manages modules within a group
+            
+### Get Modules For Group [GET]
+
+Gets the details of all modules in a single group.
+
+The parameters for this are -
++ `groupReference` The reference of the group
++ `isPosted` *(optional, defaults to none)* Whether the module identified is the posted certificate version. If no value is supplied, both posted and non-posted certificate versions will be found
+
+The returned properties are -
++ `modules` The array of modules
++ `modules\groupReference` The reference of the group
++ `modules\moduleReference` The reference of the module
++ `modules\licenceLimit` *(optional, defaults to unlimited)*. The maximum number of licences that can be used for this module. Only applicable to licensed modules, and for group allocations - for non-licensed or non-group allocations this property is ignored
++ `modules\isPosted` *(optional, defaults to false)*. Whether the module is the posted certificate version
++ `modules\allocationMethod` The type of allocation. Valid values are -
+    + Manual
+    + Automatic
+    + UserSelfEnrol
++ `modules\sendEmailOnAllocation` *(optional, defaults to false)*. Whether emails are sent to the user when the allocation is made. This is only applicable to Manual and Automatic allocation types - it will be ignored for UserSelfEnrol types
++ `modules\startDate` *(optional, defaults to now)*. The date when the allocation is to be made available to the user. Must be in UTC, according to ISO 8601
++ `modules\onlyAssessmentsMandatory` *(optional, defaults to false)*. Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `modules\automaticSettings` The settings for the automatic allocation.  This is only used when the allocationMethod is set to Automatic
++ `modules\automaticSettings\giveAgainNotStarted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that hasn't been started should be allocated another module
++ `modules\automaticSettings\giveAgainInProgress` *(optional, defaults to false)*. Defines whether users that have a existing allocation that is in progress should be allocated another module
++ `modules\automaticSettings\giveAgainCompleted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that has been completed should be allocated another module
++ `modules\selfEnrolSettings` The settings for the self-enrol allocation.  This is only used when the allocationMethod is set to UserSelfEnrol
++ `modules\selfEnrolSettings\requiresApproval` *(optional, defaults to false)*. Defines whether users require approval before self-enrolling onto the module
++ `modules\allocationDetails` The details of the allocations made to this module
++ `modules\allocationDetails\totalNotStarted` The total number of allocations that are not started
++ `modules\allocationDetails\totalInProgress` The total number of allocations that are in progress
++ `modules\allocationDetails\totalCompleted` The total number of allocations that are completed
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+          "modules": [
+            {
+              "moduleReference": "e95b38d1-6042-4f29-807c-aa950509655c",
+              "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+              "isPosted": true,
+              "allocationMethod": "Manual",
+              "sendEmailOnAllocation": true,
+              "startDate": "2056-04-23T18:25:43.511Z",
+              "onlyAssessmentsMandatory": true,
+              "automaticSettings": {
+                "giveAgainNotStarted": true,
+                "giveAgainInProgress": true,
+                "giveAgainCompleted": true
+              },
+              "selfEnrolSettings": {
+                "requiresApproval": true
+              },
+              "allocationDetails": {
+                "totalNotStarted": 0,
+                "totalInProgress": 0,
+                "totalCompleted": 0
+              }
+            }
+          ]
+        }
+
++ Response 400
+         
+         Group reference is not a valid reference/IsPosted is not a valid bool
+
++ Response 401
+
++ Response 404
+
+        Cannot find group
+
+### Adds A Module To The Group [POST]
+
+Adds a single module to a single group.
+
+The parameters for this are -
++ `groupReference` The reference of the group
++ `licenceLimit` *(optional, defaults to unlimited)*. The maximum number of licences that can be used for this module. Only applicable to licensed modules, and for group allocations - for non-licensed or non-group allocations this property is ignored
++ `moduleReference` The reference of the module
++ `isPosted` *(optional, defaults to false)*. Whether the module is the posted certificate version
++ `allocationMethod` The type of allocation. Valid values are -
+    + Manual
+    + Automatic
+    + UserSelfEnrol
++ `sendEmailOnAllocation` *(optional, defaults to false)*. Whether emails are sent to the user when the allocation is made. This is only applicable to Manual and Automatic allocation types - it will be ignored for UserSelfEnrol types
++ `startDate` *(optional, defaults to now)*. The date when the allocation is to be made available to the user. Must be in UTC, according to ISO 8601
++ `onlyAssessmentsMandatory` *(optional, defaults to false)*. Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `automaticSettings` The settings for the automatic allocation.  This is only used when the allocationMethod is set to Automatic
++ `automaticSettings\giveAgainNotStarted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that hasn't been started should be allocated another module
++ `automaticSettings\giveAgainInProgress` *(optional, defaults to false)*. Defines whether users that have a existing allocation that is in progress should be allocated another module
++ `automaticSettings\giveAgainCompleted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that has been completed should be allocated another module
++ `selfEnrolSettings` The settings for the self-enrol allocation.  This is only used when the allocationMethod is set to UserSelfEnrol
++ `selfEnrolSettings\requiresApproval` *(optional, defaults to false)*. Defines whether users require approval before self-enrolling onto the module
+
+The returned properties include the above parameters, as well as -
++ `allocationDetails` The details of the allocations made to this module
++ `allocationDetails\totalNotStarted` The total number of allocations that are not started
++ `allocationDetails\totalInProgress` The total number of allocations that are in progress
++ `allocationDetails\totalCompleted` The total number of allocations that are completed
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            {
+              "licenceLimit": 123,
+              "moduleReference": "e95b38d1-6042-4f29-807c-aa950509655c",
+              "isPosted": true,
+              "allocationMethod": "Manual",
+              "sendEmailOnAllocation": true,
+              "startDate": "2056-04-23T18:25:43.511Z",
+              "onlyAssessmentsMandatory": true,
+              "automaticSettings": {
+                "giveAgainNotStarted": true,
+                "giveAgainInProgress": true,
+                "giveAgainCompleted": true
+              },
+              "selfEnrolSettings": {
+                "requiresApproval": true
+              }
+            }
+    
++ Response 201 (application/json)
+
+        {
+          "moduleReference": "e95b38d1-6042-4f29-807c-aa950509655c",
+          "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+          "isPosted": true,
+          "allocationMethod": "Manual",
+          "sendEmailOnAllocation": true,
+          "startDate": "2056-04-23T18:25:43.511Z",
+          "onlyAssessmentsMandatory": true,
+          "automaticSettings": {
+            "giveAgainNotStarted": true,
+            "giveAgainInProgress": true,
+            "giveAgainCompleted": true
+          },
+          "selfEnrolSettings": {
+            "requiresApproval": true
+          },
+          "allocationDetails": {
+            "totalNotStarted": 0,
+            "totalInProgress": 0,
+            "totalCompleted": 0
+          }
+        }
+
++ Response 400
+         
+         Group reference is not a valid reference/Module reference is not a valid reference/Module already exists for the group
+
++ Response 400
+
+        [
+            "IsPosted is not a valid bool",
+            "AllocationMethod is not an expected value",
+            "SendEmailOnAllocation is not a valid bool",
+            "StartDate is not a valid date",
+            "OnlyAssessmentsMandatory is not a valid bool",
+            "LicenceLimit is not a valid number",
+            "GiveAgainNotStarted is not a valid bool",
+            "GiveAgainInProgress is not a valid bool",
+            "GiveAgainCompleted is not a valid bool",
+            "RequiresApproval is not a valid bool"
+        ]
+
++ Response 401
+
++ Response 404
+
+        Cannot find group/Cannot find module
+        
+## Group Module [/groups/{groupReference}/modules/{moduleReference}]
+
+Manages a single module within a group.
+
+### Get Module For Group [GET]
+
+The parameters for this are -
++ `groupReference` The reference of the group
++ `moduleReference` The reference of the module
++ `isPosted` *(optional, defaults to false)* Whether the module identified is the posted certificate version
+
+The returned properties are -
++ `groupReference` The reference of the group
++ `moduleReference` The reference of the module
++ `licenceLimit` *(optional, defaults to unlimited)*. The maximum number of licences that can be used for this module. Only applicable to licensed modules, and for group allocations - for non-licensed or non-group allocations this property is ignored
++ `isPosted` *(optional, defaults to false)*. Whether the module is the posted certificate version
++ `allocationMethod` The type of allocation. Valid values are -
+    + Manual
+    + Automatic
+    + UserSelfEnrol
++ `sendEmailOnAllocation` *(optional, defaults to false)*. Whether emails are sent to the user when the allocation is made. This is only applicable to Manual and Automatic allocation types - it will be ignored for UserSelfEnrol types
++ `startDate` *(optional, defaults to now)*. The date when the allocation is to be made available to the user. Must be in UTC, according to ISO 8601
++ `onlyAssessmentsMandatory` *(optional, defaults to false)*. Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `automaticSettings` The settings for the automatic allocation.  This is only used when the allocationMethod is set to Automatic
++ `automaticSettings\giveAgainNotStarted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that hasn't been started should be allocated another module
++ `automaticSettings\giveAgainInProgress` *(optional, defaults to false)*. Defines whether users that have a existing allocation that is in progress should be allocated another module
++ `automaticSettings\giveAgainCompleted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that has been completed should be allocated another module
++ `selfEnrolSettings` The settings for the self-enrol allocation.  This is only used when the allocationMethod is set to UserSelfEnrol
++ `selfEnrolSettings\requiresApproval` *(optional, defaults to false)*. Defines whether users require approval before self-enrolling onto the module
++ `allocationDetails` The details of the allocations made to this module
++ `allocationDetails\totalNotStarted` The total number of allocations that are not started
++ `allocationDetails\totalInProgress` The total number of allocations that are in progress
++ `allocationDetails\totalCompleted` The total number of allocations that are completed
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB 
+
++ Response 200 (application/json)
+            
+        {
+          "moduleReference": "e95b38d1-6042-4f29-807c-aa950509655c",
+          "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+          "isPosted": true,
+          "allocationMethod": "Manual",
+          "sendEmailOnAllocation": true,
+          "startDate": "2056-04-23T18:25:43.511Z",
+          "onlyAssessmentsMandatory": true,
+          "automaticSettings": {
+            "giveAgainNotStarted": true,
+            "giveAgainInProgress": true,
+            "giveAgainCompleted": true
+          },
+          "selfEnrolSettings": {
+            "requiresApproval": true
+          },
+          "allocationDetails": {
+            "totalNotStarted": 0,
+            "totalInProgress": 0,
+            "totalCompleted": 0
+          }
+        }
+
++ Response 400
+
+        Group reference is not a valid reference/Module reference is not a valid reference/IsPosted is not a valid bool
+        
++ Response 401
+
++ Response 404
+
+        Cannot find group/Cannot find module in the group
+        
+## Updates A Module In The Group [PUT]
+
+Updates a single module in a single group.
+
+The parameters for this are -
++ `groupReference` The reference of the group
++ `moduleReference` The reference of the module
++ `isPosted` *(optional, defaults to false)*. Whether the module is the posted certificate version
++ `allocationMethod` The type of allocation. Valid values are -
+    + Manual
+    + Automatic
+    + UserSelfEnrol
++ `sendEmailOnAllocation` *(optional, defaults to false)*. Whether emails are sent to the user when the allocation is made. This is only applicable to Manual and Automatic allocation types - it will be ignored for UserSelfEnrol types
++ `startDate` *(optional, defaults to now)*. The date when the allocation is to be made available to the user. Must be in UTC, according to ISO 8601
++ `onlyAssessmentsMandatory` *(optional, defaults to false)*. Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `automaticSettings` The settings for the automatic allocation.  This is only used when the allocationMethod is set to Automatic
++ `automaticSettings\giveAgainNotStarted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that hasn't been started should be allocated another module
++ `automaticSettings\giveAgainInProgress` *(optional, defaults to false)*. Defines whether users that have a existing allocation that is in progress should be allocated another module
++ `automaticSettings\giveAgainCompleted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that has been completed should be allocated another module
++ `selfEnrolSettings` The settings for the self-enrol allocation.  This is only used when the allocationMethod is set to UserSelfEnrol
++ `selfEnrolSettings\requiresApproval` *(optional, defaults to false)*. Defines whether users require approval before self-enrolling onto the module
+
+The returned properties include the above parameters, as well as -
++ `allocationDetails` The details of the allocations made to this module
++ `allocationDetails\totalNotStarted` The total number of allocations that are not started
++ `allocationDetails\totalInProgress` The total number of allocations that are in progress
++ `allocationDetails\totalCompleted` The total number of allocations that are completed
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            {
+              "isPosted": true,
+              "allocationMethod": "Manual",
+              "sendEmailOnAllocation": true,
+              "startDate": "2056-04-23T18:25:43.511Z",
+              "onlyAssessmentsMandatory": true,
+              "automaticSettings": {
+                "giveAgainNotStarted": true,
+                "giveAgainInProgress": true,
+                "giveAgainCompleted": true
+              },
+              "selfEnrolSettings": {
+                "requiresApproval": true
+              }
+            }
+    
++ Response 200 (application/json)
+
+        {
+          "moduleReference": "e95b38d1-6042-4f29-807c-aa950509655c",
+          "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+          "isPosted": true,
+          "allocationMethod": "Manual",
+          "sendEmailOnAllocation": true,
+          "startDate": "2056-04-23T18:25:43.511Z",
+          "onlyAssessmentsMandatory": true,
+          "automaticSettings": {
+            "giveAgainNotStarted": true,
+            "giveAgainInProgress": true,
+            "giveAgainCompleted": true
+          },
+          "selfEnrolSettings": {
+            "requiresApproval": true
+          },
+          "allocationDetails": {
+            "totalNotStarted": 0,
+            "totalInProgress": 0,
+            "totalCompleted": 0
+          }
+        }
+
++ Response 400
+         
+         Group reference is not a valid reference/Module reference is not a valid reference
+
++ Response 400
+
+        [
+            "IsPosted is not a valid bool",
+            "AllocationMethod is not an expected value",
+            "SendEmailOnAllocation is not a valid bool",
+            "StartDate is not a valid date",
+            "OnlyAssessmentsMandatory is not a valid bool",
+            "GiveAgainNotStarted is not a valid bool",
+            "GiveAgainInProgress is not a valid bool",
+            "GiveAgainCompleted is not a valid bool",
+            "RequiresApproval is not a valid bool"
+        ]
+        
++ Response 401
+
++ Response 404
+
+        Cannot find group/Cannot find module in the group
+        
+## Partially Updates A Module In The Group [PATCH]
+
+Partially updates a single module in a single group.
+
+The parameters for this are -
++ `groupReference` The reference of the group
++ `moduleReference` The reference of the module
++ `isPosted` *(optional, defaults to false)*. Whether the module is the posted certificate version
++ `allocationMethod` The type of allocation. Valid values are -
+    + Manual
+    + Automatic
+    + UserSelfEnrol
++ `sendEmailOnAllocation` *(optional, defaults to false)*. Whether emails are sent to the user when the allocation is made. This is only applicable to Manual and Automatic allocation types - it will be ignored for UserSelfEnrol types
++ `startDate` *(optional, defaults to now)*. The date when the allocation is to be made available to the user. Must be in UTC, according to ISO 8601
++ `onlyAssessmentsMandatory` *(optional, defaults to false)*. Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `automaticSettings` The settings for the automatic allocation.  This is only used when the allocationMethod is set to Automatic
++ `automaticSettings\giveAgainNotStarted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that hasn't been started should be allocated another module
++ `automaticSettings\giveAgainInProgress` *(optional, defaults to false)*. Defines whether users that have a existing allocation that is in progress should be allocated another module
++ `automaticSettings\giveAgainCompleted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that has been completed should be allocated another module
++ `selfEnrolSettings` The settings for the self-enrol allocation.  This is only used when the allocationMethod is set to UserSelfEnrol
++ `selfEnrolSettings\requiresApproval` *(optional, defaults to false)*. Defines whether users require approval before self-enrolling onto the module
+
+The returned properties include the above parameters, as well as -
++ `allocationDetails` The details of the allocations made to this module
++ `allocationDetails\totalNotStarted` The total number of allocations that are not started
++ `allocationDetails\totalInProgress` The total number of allocations that are in progress
++ `allocationDetails\totalCompleted` The total number of allocations that are completed
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            {
+              "isPosted": true,
+              "allocationMethod": "Manual",
+              "sendEmailOnAllocation": true,
+              "startDate": "2056-04-23T18:25:43.511Z",
+              "onlyAssessmentsMandatory": true,
+              "automaticSettings": {
+                "giveAgainNotStarted": true,
+                "giveAgainInProgress": true,
+                "giveAgainCompleted": true
+              },
+              "selfEnrolSettings": {
+                "requiresApproval": true
+              }
+            }
+    
++ Response 200 (application/json)
+
+        {
+          "moduleReference": "e95b38d1-6042-4f29-807c-aa950509655c",
+          "groupReference": "232d8fb8-fee0-4e5a-818c-30632c865c2b",
+          "isPosted": true,
+          "allocationMethod": "Manual",
+          "sendEmailOnAllocation": true,
+          "startDate": "2056-04-23T18:25:43.511Z",
+          "onlyAssessmentsMandatory": true,
+          "automaticSettings": {
+            "giveAgainNotStarted": true,
+            "giveAgainInProgress": true,
+            "giveAgainCompleted": true
+          },
+          "selfEnrolSettings": {
+            "requiresApproval": true
+          },
+          "allocationDetails": {
+            "totalNotStarted": 0,
+            "totalInProgress": 0,
+            "totalCompleted": 0
+          }
+        }
+
++ Response 400
+         
+         Group reference is not a valid reference/Module reference is not a valid reference
+
++ Response 400
+
+        [
+            "IsPosted is not a valid bool",
+            "AllocationMethod is not an expected value",
+            "SendEmailOnAllocation is not a valid bool",
+            "StartDate is not a valid date",
+            "OnlyAssessmentsMandatory is not a valid bool",
+            "GiveAgainNotStarted is not a valid bool",
+            "GiveAgainInProgress is not a valid bool",
+            "GiveAgainCompleted is not a valid bool",
+            "RequiresApproval is not a valid bool"
+        ]
+        
++ Response 401
+
++ Response 404
+
+        Cannot find group/Cannot find module in the group
+
+## Delete Group Module [/groups/{groupReference}/modules/{moduleReference}/delete]
+
+### Deletes A Module From The Group [POST]
+
+Removes a single module from a single group
+
+The parameters for this are -
++ `groupReference` The reference of the group
++ `moduleReference` The reference of the module
++ `isPosted` *(optional, defaults to false)*. Whether the module is the posted certificate version
++ `deleteNotStartedAllocations` *(optional, defaults to false)*. Whether not started allocations for this module are also deleted
++ `deleteInProgressAllocations` *(optional, defaults to false)*. Whether in progress allocations for this module are also deleted
++ `deleteCompletedAllocations` *(optional, defaults to false)*. Whether completed allocations for this module are also deleted
+     
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
+    + Body
+        
+            {
+              "isPosted": true,
+              "deleteNotStartedAllocations": true,
+              "deleteInProgressAllocations": true,
+              "deleteCompletedAllocations": true
+            }
+            
++ Response 204
+
++ Response 400
+
+        Group reference is not a valid reference/Module reference is not a valid reference
+        
++ Response 400
+
+        [
+            "IsPosted is not a valid bool",
+            "DeleteNotStartedAllocations is not a valid bool",
+            "DeleteInProgressAllocations is not a valid bool",
+            "DeleteCompletedAllocations is not a valid bool"
+        ]
+        
++ Response 401
+
++ Response 404
+
+        Cannot find group/Cannot find module in the group
+            
 # Group Classifications
 Classification related resources of the **Enable API**
 
