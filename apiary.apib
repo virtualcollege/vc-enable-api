@@ -12,7 +12,7 @@ Every request to the API must specify the following headers:
 - x-api-version: Allows the server to determine what version of the API should be used
 - x-api-nonce: Used to protect against replay attacks.  Every request must specify a nonce that is globally unique over a given period of time.  This has a max-length of 450 characters. We suggest using a GUID to ensure that the nonce is unique.
 
-Requests to API functions which require the client to authenticate must also specify the following headers:
+Requests to API functions which requireMember - Standard Authentication the client to authenticate must also specify the following headers:
 - x-api-access-token: Used to authenticate the client and verify the source of API requests
 
 **Remarks**
@@ -745,6 +745,327 @@ The parameters are -
 
 + Response 404
 
+## Groups [/users/{userIdentifier}/groups]
+
+Manages multiple groups for a user.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### List Groups For User [GET]
+
+Returns the list of groups for the user, including their member role.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user. This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            "groups":
+            [
+                {
+                    groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                    role: "admin"
+                },
+                {
+                    groupReference: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404 
+
+        Cannot find user
+
+### Add Groups To User [PUT]
+
+Adds or updates the groups for a user. If no role is specified for a group member, then the member will be added with the 'user' role (no role change is made if the group member already exists).
+
+If the user already exists in any of the groups, then the member's role is updated.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user
++ `groups` *(required)* An array of groups that is used to identify which groups are to be added for the user
++ `groups\groupReference` *(required)* The reference of the group
++ `groups\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+
+If a group reference is not found, or if it is not a valid reference, then that reference will be returned in an error and no group members will be added.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+
+If a group member already exists, and no role is specified in the request, then the group member's role is not changed.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                groups:
+                [
+                    {
+                        groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                        role: "admin"
+                    },
+                    {
+                        groupReference: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                        role: "user"
+                    }
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "groups":
+            [
+                {
+                    groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                    role: "admin"
+                },
+                {
+                    userIdentifier: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        [
+            "Cannot find group: 55e19dcf-751c-423a-9781-1ab72d9083d3"
+        ]
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 400
+
+        [
+            "GroupReference is required"
+        ]
+
++ Response 400
+
+        [
+            "Invalid group reference: NOT-A-GUID"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find user
+
+## Group Member [/users/{userIdentifier}/groups/{groupReference}]
+
+Manages a single user within a group.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### Get Group Member [GET]
+
+Returns the details of a group member, including their member role.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+### Update Group Member [PUT]
+
+Adds (or updates) a single group member, including setting the group member's role. If no role is specified for a group member, then the member will be added with the 'user' role.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
++ `groupReference` *(required)* The reference of the group
++ `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+ 
+If the user already exists in the group, then the user's membership type will be updated if a role is specified.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                role: "admin"
+            }
+            
++ Response 200 (application/json)
+
+        {
+            groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
+### Delete Group Member [DELETE]
+
+Removes a user from a group.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If the user has already been removed from the group (or has never been added to the group) then no change is made.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 204
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
 ## Remove Line Managers For User [/users/{userIdentifier}/RemoveLineManagersForUser]
 
 Removes line managers for a user
@@ -1140,6 +1461,328 @@ The parameters are -
 
 + Response 404
 
+## Groups [/users/sso/{id}/groups]
+
+Manages multiple groups for a user.
+
+**Who can use these endpoints?**
+
+The endpoints in this section can only be used by customers that have Enable configured to authenticate users with:
++ AD FS (SSO)
+
+Customers using **Email Addresses** or **Usernames** authentication will receive a 403 Forbidden error, and the endpoints in the <a href="#reference/users-standard-authentication">Users - Standard Authentication</a> section should be used instead.
+
+### List Groups For User [GET]
+
+Returns the list of groups for the user, including their member role.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            "groups":
+            [
+                {
+                    groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                    role: "admin"
+                },
+                {
+                    groupReference: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404 
+
+        Cannot find user
+
+### Add Groups To User [PUT]
+
+Adds or updates the groups for a user. If no role is specified for a group member, then the member will be added with the 'user' role (no role change is made if the group member already exists).
+
+If the user already exists in any of the groups, then the member's role is updated.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `groups` *(required)* An array of groups that is used to identify which groups are to be added for the user
++ `groups\groupReference` *(required)* The reference of the group
++ `groups\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+
+If a group reference is not found, or if it is not a valid reference, then that reference will be returned in an error and no group members will be added.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+
+If a group member already exists, and no role is specified in the request, then the group member's role is not changed.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                groups:
+                [
+                    {
+                        groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                        role: "admin"
+                    },
+                    {
+                        groupReference: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                        role: "user"
+                    }
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "groups":
+            [
+                {
+                    groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                    role: "admin"
+                },
+                {
+                    userIdentifier: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        [
+            "Cannot find group: 55e19dcf-751c-423a-9781-1ab72d9083d3"
+        ]
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 400
+
+        [
+            "GroupReference is required"
+        ]
+
++ Response 400
+
+        [
+            "Invalid group reference: NOT-A-GUID"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find user
+
+## Group Member [/users/sso/{id}/groups/{groupReference}]
+
+Manages a single user within a group.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### Get Group Member [GET]
+
+Returns the details of a group member, including their member role.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+### Update Group Member [PUT]
+
+Adds (or updates) a single group member, including setting the group member's role. If no role is specified for a group member, then the member will be added with the 'user' role.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `groupReference` *(required)* The reference of the group
++ `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+ 
+If the user already exists in the group, then the user's membership type will be updated if a role is specified.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                role: "admin"
+            }
+            
++ Response 200 (application/json)
+
+        {
+            groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
+### Delete Group Member [DELETE]
+
+Removes a user from a group.
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If the user has already been removed from the group (or has never been added to the group) then no change is made.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 204
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
 ## Remove Line Managers For User [/users/sso/{id}/removeLineManagers]
 
 Removes line managers for a user
@@ -1403,6 +2046,9 @@ Gets a list of groups.
 
 The parameters are -
 + `search` *(optional)* A free-text search that filters the list of groups based on the name of the group (case insensitive).
++ `classifications` *(optional)* The classification details that filters the list of groups based on the group's classifications.  The classification names need to match exactly, but are case insensitive.
++ `classifications\values` The list of classification names that need to match exactly (case insensitive).  If an empty or null array is provided then the classification filter is ignored.
++ `classifications\matchAny` *(optional, defaults to false)* Defines how multiple matches are to be made.  When true, the object is found if any of the values in the list are a match.  When false, the object is found if all values in the list are a match.
 + `pageSize` *(optional, defaults to 12)* The number of items to return for a page
 + `pageNumber` *(optional, defaults to 1)* The requested page.  This number is 1-based (such as the first page is `pageNumber: 1`)
 + `order` *(optional, defaults to AlphaAscending)* The order of the groups.  The available options are -
@@ -1435,7 +2081,12 @@ No results will return `totalGroups: 0` and an empty array.
                 "search": "Group 1", 
                 "pageSize": 24,
                 "pageNumber": 1,
-                "order": "DateDescending"
+                "order": "DateDescending",
+                "classifications":
+                {
+                    "values": ["Classification1", "Classification2"],
+                    "matchAny": true
+                }
             }
     
 + Response 200 (application/json)
@@ -1460,6 +2111,653 @@ No results will return `totalGroups: 0` and an empty array.
 + Response 401
 
 + Response 404
+
+## Members - Standard Authentication [/groups/{groupReference}/users]
+
+Manages multiple users within a group, for domains using standard authentication.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### List Users In Group [GET]
+
+Returns the list of users within the group, including their member type.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            "members":
+            [
+                {
+                    userIdentifier: "testuser1@abc.com",
+                    role: "admin"
+                },
+                {
+                    userIdentifier: "testuser2@abc.com",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404 
+
+        Cannot find group
+
+### Add Users To Group [PUT]
+
+Adds or updates the specified users in the group. Accepts a list of email addressess or user names (depending on how the customer has Enable configured to identify the users) and a reference for the target group.
+
+If any of the specified users already exist in the group, then the member's role is updated.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `members` *(required)* An array of users that is used to identify which users are to be added to the group
++ `members\userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user to add
++ `members\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If a user is not found for a specific identifier, then that identifier will be returned in an error and no users will be added.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+
+If a group member already exists, and no role is specified in the request, then the group member's role is not changed.
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                members:
+                [
+                    {
+                        userIdentifier: "testuser1@abc.com",
+                        role: "admin"
+                    },
+                    {
+                        userIdentifier: "testuser2@abc.com",
+                        role: "user"
+                    }
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "members":
+            [
+                {
+                    userIdentifier: "testuser1@abc.com",
+                    role: "admin"
+                },
+                {
+                    userIdentifier: "testuser2@abc.com",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Cannot find user: testuser2@abc.com"
+        ]
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 400
+
+        [
+            "User Identifier is required"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
+## Member - Standard Authentication [/groups/{groupReference}/users/{userIdentifier}]
+
+Manages a single user within a group, for domains using standard authentication.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ User Name and Email Address
+
+### Get Group Member [GET]
+
+Returns the details of a group member.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) of the user
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            userIdentifier: "testuser1@abc.com",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+### Update Group Member [PUT]
+
+Adds (or updates) a single group member, including setting the group member's type.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
++ `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+ 
+If the user already exists in the group, then the user's membership type will be updated if a role is specified.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                role: "admin"
+            }
+            
++ Response 200
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
+### Delete Group Member [DELETE]
+
+Removes a user from a group.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users) to search by (case insensitive). This value must be encoded for use in URIs - e.g. the @ character should be replaced with %40
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If the user has already been removed from the group (or has never been added to the group) then no change is made.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 204
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+## Members - AD FS Authentication [/groups/{groupReference}/users/sso]
+
+Manages multiple users within a group, for domains using AD FS authentication.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ AD FS (SSO)
+
+### List Users In Group [GET]
+
+Returns the list of users within the group, including their member type.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            "members":
+            [
+                {
+                    id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+                    role: "admin"
+                },
+                {
+                    id: "S-1-5-21-2527162006-4105834857-2401098550-2614",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
+### Add SSO Users To Group [PUT]
+
+Adds or updates the specified users in the group. Accepts a list of the SID of the user and a reference for the target group.
+
+If any of the specified users already exist in the group, then the member's role is updated.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `members` *(required)* An array of users that is used to identify which users are to be added to the group
++ `members\id` *(required)* The SID of the user to add
++ `members\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If a user is not found for a specific identifier, then that identifier will be returned in an error and no users will be added.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+
+If a group member already exists, and no role is specified in the request, then the group member's role is not changed.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                members:
+                [
+                    {
+                        id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+                        role: "admin"
+                    },
+                    {
+                        id: "S-1-5-21-2527162006-4105834857-2401098550-2614",
+                        role: "user"
+                    }
+                ]
+            }
+            
++ Response 200 (application/json)
+
+        {
+            "members":
+            [
+                {
+                    id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+                    role: "admin"
+                },
+                {
+                    id: "S-1-5-21-2527162006-4105834857-2401098550-2614",
+                    role: "user"
+                }
+            ]
+        }
+
++ Response 400
+
+        [
+            "Cannot find user: S-1-5-21-2527162006-4105834857-2401098550-2613"
+        ]
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 400
+
+        [
+            "id is required"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        [
+            "Cannot find group"
+        ]
+
+## Member - AD FS Authentication [/groups/{groupReference}/users/sso/{id}]
+
+Manages a single user within a group, for domains using AD FS authentication.
+
+**Who can use this endpoint?**
+
+This endpoint can only be used by customers that have Enable configured to authenticate users with:
+
++ AD FS (SSO)
+
+### Get Group Member [GET]
+
+Returns the details of a group member.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200 (application/json)
+
+        {
+            id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
+
+### Update Group Member [PUT]
+
+Adds (or updates) a single group member, including setting the group member's role. If no role is specified for a group member, then the member will be added with the 'user' role (no role change is made if the group member already exists).
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
+    + `user` A basic member of the group
+    + `moderator` A moderator of the group
+    + `admin` An admin of the group
+    + `readonly` A read-only member of the group
+ 
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If an unexpected role is found, then an error will be returned and no users will be added.
+ 
+If the user already exists in the group, then the user's membership type will be updated if a role is specified.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                role: "admin"
+            }
+            
++ Response 200 (application/json)
+
+        {
+            id: "S-1-5-21-2527162006-4105834857-2401098550-2613",
+            role: "admin"
+        }
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 400
+
+        [
+            "Unexpected role: unknownRoleName"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
+### Delete Group Member [DELETE]
+
+Removes a user from a group.
+
+The parameters are -
++ `groupReference` *(required)* The reference of the group
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
+
+If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
+ 
+If the user is not found then an error will be returned.
+ 
+If the user has already been removed from the group (or has never been added to the group) then no change is made.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 204
+
++ Response 400
+
+        Group reference is not a valid reference
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use AD FS
+
++ Response 404
+
+        Cannot find group
+
++ Response 404
+
+        Cannot find user
+
++ Response 404
+
+        User is not a member of this group
 
 ## Remove SSO Users From Group [/groups/{groupReference}/sso/removeusers]
 
