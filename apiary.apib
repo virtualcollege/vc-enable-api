@@ -12,7 +12,7 @@ Every request to the API must specify the following headers:
 - x-api-version: Allows the server to determine what version of the API should be used
 - x-api-nonce: Used to protect against replay attacks.  Every request must specify a nonce that is globally unique over a given period of time.  This has a max-length of 450 characters. We suggest using a GUID to ensure that the nonce is unique.
 
-Requests to API functions which requireMember - Standard Authentication the client to authenticate must also specify the following headers:
+Requests to API functions which require the client to authenticate must also specify the following headers:
 - x-api-access-token: Used to authenticate the client and verify the source of API requests
 
 **Remarks**
