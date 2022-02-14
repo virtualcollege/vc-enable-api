@@ -1249,13 +1249,13 @@ Accepts an array of user objects.  The "id" property is used to identify the use
 ### Import users [POST]
 
 The parameters are -
-+ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `firstName` *(required)* The first name of the user.  Maximum 255 characters
 + `lastName` *(required)* The last name of the user.  Maximum 255 characters
 + `emailAddress` *(required)* The email address of the user.  Maximum 100 characters
 + `accountName` *(optional)* The account name of the user.  For AD FS SSO, this should be the SamAccountName.  Maximum 100 characters
 + `groupReferences` *(optional)* An array of Groups (GUIDs) to add the user to. Users are only added to groups via this call, not removed.
-+ `lineManagers` *(optional)* An array of Line Manager User Ids (SIDs) to associate with the user. Line Managers are only added to users via this call, not removed.  A user cannot be their own direct line manager.
++ `lineManagers` *(optional)* An array of Line Manager User Ids (SID/object ID) to associate with the user. Line Managers are only added to users via this call, not removed.  A user cannot be their own direct line manager.
 
 If the user does not already exist, it is added.  If they already exist, they are updated.
 
@@ -1317,7 +1317,7 @@ Sets SSO users from the LMS as active.
 
 The parameters are -
 
-+ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 
 Activates the specified users. Accepts a list of ids to identify users.
 
@@ -1365,7 +1365,7 @@ Deletes SSO users from the LMS.
 ### Delete users [POST]
 
 The parameters are -
-+ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 
  Deletes the specified users.  Accepts a list of ids to identify users.
  
@@ -1411,7 +1411,7 @@ Removes a user from a list of groups.
 ### Remove User From Group [POST]
 
 The parameters are -
-+ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `references` *(required)* An array of references for each group the user is intended to be removed from
 
  Removes the specified user from the groups. Accepts a list of references to identify the groups and an id for the target user.
@@ -1477,7 +1477,7 @@ Customers using **Email Addresses** or **Usernames** authentication will receive
 Returns the list of groups for the user, including their member role.
 
 The parameters are -
-+ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 
 + Request (application/json)
 
@@ -1521,7 +1521,7 @@ Adds or updates the groups for a user. If no role is specified for a group membe
 If the user already exists in any of the groups, then the member's role is updated.
 
 The parameters are -
-+ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `groups` *(required)* An array of groups that is used to identify which groups are to be added for the user
 + `groups\groupReference` *(required)* The reference of the group
 + `groups\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
@@ -1626,7 +1626,7 @@ This endpoint can only be used by customers that have Enable configured to authe
 Returns the details of a group member, including their member role.
 
 The parameters are -
-+ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `groupReference` *(required)* The reference of the group
 
 If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
@@ -1674,7 +1674,7 @@ If the group reference is not a valid reference, or if the group cannot be found
 Adds (or updates) a single group member, including setting the group member's role. If no role is specified for a group member, then the member will be added with the 'user' role.
 
 The parameters are -
-+ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `groupReference` *(required)* The reference of the group
 + `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
     + `user` A basic member of the group
@@ -1741,7 +1741,7 @@ If the user already exists in the group, then the user's membership type will be
 Removes a user from a group.
 
 The parameters are -
-+ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `groupReference` *(required)* The reference of the group
 
 If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
@@ -1789,7 +1789,7 @@ Removes line managers for a user
 ### Remove Line Managers For A User [POST]
 
 The parameters are -
-+ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user.  For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `references` *(required)* An array of line managers' references to be removed from the user
 
  Removes line managers for the user. Accepts a list of references to identify the line managers and an id for the target user.
@@ -2398,7 +2398,7 @@ Gets the list of allocations for the module for the user.
 
 The parameters are -
 + `moduleReference` The reference of the module
-+ `id` The id of the user. For AD FS SSO, this should be the SID
++ `id` The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `groupReference` *(optional, defaults to none)* The reference of the group
 + `isPosted` *(optional, defaults to false)* Whether the module identified is the posted certificate version
 
@@ -2470,7 +2470,7 @@ Adds a new allocation to the user.
 
 The parameters are -
 + `moduleReference` The reference of the module
-+ `id` The id of the user. For AD FS SSO, this should be the SID
++ `id` The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `groupReference` *(optional, defaults to none)* The reference of the group
 + `isPosted` *(optional, defaults to false)* Whether the module is the posted certificate version
 + `allocationDate` *(optional, defaults to current date/time)* The date when the allocation is to be made available to the user
@@ -3172,14 +3172,14 @@ If the group reference is not a valid reference, or if the group cannot be found
 
 ### Add SSO Users To Group [PUT]
 
-Adds or updates the specified users in the group. Accepts a list of the SID of the user and a reference for the target group.
+Adds or updates the specified users in the group. Accepts a list of the SID/object ID of the user and a reference for the target group.
 
 If any of the specified users already exist in the group, then the member's role is updated.
 
 The parameters are -
 + `groupReference` *(required)* The reference of the group
 + `members` *(required)* An array of users that is used to identify which users are to be added to the group
-+ `members\id` *(required)* The SID of the user to add
++ `members\id` *(required)* The SID/object ID of the user to add
 + `members\role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
     + `user` A basic member of the group
     + `moderator` A moderator of the group
@@ -3281,7 +3281,7 @@ Returns the details of a group member.
 
 The parameters are -
 + `groupReference` *(required)* The reference of the group
-+ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 
 If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
  
@@ -3329,7 +3329,7 @@ Adds (or updates) a single group member, including setting the group member's ro
 
 The parameters are -
 + `groupReference` *(required)* The reference of the group
-+ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 + `role` *(optional)* The role of the user within the group (allowed values are listed below).  By default, this role is set as 'user'.  The allowed options are -
     + `user` A basic member of the group
     + `moderator` A moderator of the group
@@ -3396,7 +3396,7 @@ Removes a user from a group.
 
 The parameters are -
 + `groupReference` *(required)* The reference of the group
-+ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
 
 If the group reference is not a valid reference, or if the group cannot be found, an error will be returned.
  
@@ -3453,7 +3453,7 @@ Customers using **Email Address** or **Username** authentication will receive a 
 
 The parameters are -
 + `groupReference` *(required)* The reference of the group.
-+ `Ids` *(required)* An array of id's for each user intended to be removed from the group. As this is for AD FS SSO, the id should be the SID
++ `Ids` *(required)* An array of id's for each user intended to be removed from the group. As this is for AD FS SSO, the id should be the SID.  For Azure AD, this should be the object ID (oid).
 
  Removes the specified users from the group. Accepts a list of ids to identify the users and a reference for the target group.
  
