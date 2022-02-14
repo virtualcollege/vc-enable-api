@@ -106,8 +106,9 @@ The endpoints in this section can be used by all customers, including those that
 + Email Address
 + Username
 + AD FS (SSO)
++ Azure AD (SSO)
 
-For other endpoints relating to users, see <a href="#reference/users-standard-authentication">Users - Standard Authentication</a> for Email Address/Username domains, and <a href="#reference/users-ad-fs-authentication">Users - AD FS Authentication</a> for AD FS domains.
+For other endpoints relating to users, see <a href="#reference/users-standard-authentication">Users - Standard Authentication</a> for Email Address/Username domains, and <a href="#reference/users-sso-authentication">Users - SSO Authentication</a> for SSO domains.
 
 ## Find Users [/users/search]
 Gets a list of users.
@@ -134,7 +135,7 @@ Returned properties are -
 + `users\userName` This is the user name of the user
 + `users\createdDate` This is the date and time at which the user was created.  This date is **UTC**, according to **ISO 8601**
 + `users\isInactive` A boolean value to denote if the user is inactive or not
-+ `users\providerUserKey` This is the security identifier of the ADFS user (only applicable for SSO AD domains)
++ `users\providerUserKey` This is the security identifier of the AD FS/Azure AD user (only applicable for SSO AD domains)
 + `users\additional` An array of additional properties, including optional fields
 + `users\additional\name` The name of the property, in English
 + `users\additional\value` The value of the property.  The type will be dependent on the type of the field itself
@@ -307,7 +308,7 @@ The endpoints in this section can only be used by customers that have Enable con
 + Email Address
 + Username
 
-Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error, and the endpoints in the <a href="#reference/users-ad-fs-authentication">Users - AD FS Authentication</a> section should be used instead.
+Customers using **AD FS/Azure AD (SSO)** authentication will receive a 403 Forbidden error, and the endpoints in the <a href="#reference/users-sso-authentication">Users - SSO Authentication</a> section should be used instead.
 
 ## Create User [/users/]
 Creates a new user
@@ -1229,14 +1230,15 @@ Users who have already been sent a welcome email will not receive a second welco
 
 + Response 409
 
-# Group Users - AD FS Authentication
+# Group Users - SSO Authentication
 
 SSO User related resources of the **Enable API**
 
 **Who can use these endpoints?**
 
 The endpoints in this section can only be used by customers that have Enable configured to authenticate users with:
-+ AD FS (SSO)
++ AD FS
++ Azure AD
 
 Customers using **Email Addresses** or **Usernames** authentication will receive a 403 Forbidden error, and the endpoints in the <a href="#reference/users-standard-authentication">Users - Standard Authentication</a> section should be used instead.
 
@@ -1306,7 +1308,7 @@ Note: The system enforces uniqueness in the email address used and hence if the 
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -1355,7 +1357,7 @@ If a user is not found for a specific id, then an error will be returned includi
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -1400,7 +1402,7 @@ The parameters are -
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -1457,7 +1459,7 @@ The parameters are -
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -1468,7 +1470,8 @@ Manages multiple groups for a user.
 **Who can use these endpoints?**
 
 The endpoints in this section can only be used by customers that have Enable configured to authenticate users with:
-+ AD FS (SSO)
++ AD FS
++ Azure AD
 
 Customers using **Email Addresses** or **Usernames** authentication will receive a 403 Forbidden error, and the endpoints in the <a href="#reference/users-standard-authentication">Users - Standard Authentication</a> section should be used instead.
 
@@ -1508,7 +1511,7 @@ The parameters are -
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404 
 
@@ -1605,7 +1608,7 @@ If a group member already exists, and no role is specified in the request, then 
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -1655,7 +1658,7 @@ If the group reference is not a valid reference, or if the group cannot be found
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -1726,7 +1729,7 @@ If the user already exists in the group, then the user's membership type will be
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -1769,7 +1772,7 @@ If the user has already been removed from the group (or has never been added to 
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -1828,7 +1831,7 @@ The parameters are -
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -1927,7 +1930,7 @@ This endpoint can only be used by customers that have Enable configured to authe
 + Email Address
 + Username
 
-Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+Customers using **AD FS/Azure AD (SSO)** authentication will receive a 403 Forbidden error.
 
 ### Check user has allocation [POST]
 
@@ -1988,7 +1991,7 @@ This endpoint can only be used by customers that have Enable configured to authe
 + Email Address
 + Username
 
-Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+Customers using **AD FS/Azure AD (SSO)** authentication will receive a 403 Forbidden error.
 
 ### Allocate module to user [POST]
 
@@ -2045,7 +2048,7 @@ This endpoint can only be used by customers that have Enable configured to authe
 + Email Address
 + Username
 
-Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+Customers using **AD FS/Azure AD (SSO)** authentication will receive a 403 Forbidden error.
 
 ### Get Allocations For Users [GET]
 
@@ -2135,7 +2138,7 @@ This endpoint can only be used by customers that have Enable configured to authe
 + Email Address
 + Username
 
-Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+Customers using **AD FS/Azure AD (SSO)** authentication will receive a 403 Forbidden error.
 
 ### List [GET]
 
@@ -2298,7 +2301,8 @@ Returned properties are -
 
 This endpoint can only be used by customers that have Enable configured to authenticate users with:
 
-+ AD FS (SSO)
++ AD FS
++ Azure AD
 
 Customers using **Email Address** or **Username** authentication will receive a 403 Forbidden error. They should be using the non-SSO version of the method given in the documentation.
 
@@ -2373,7 +2377,7 @@ Returned properties are -
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -2388,7 +2392,8 @@ Manages the allocations for an SSO user for a specific module.
 
 This endpoint can only be used by customers that have Enable configured to authenticate users with:
 
-+ AD FS (SSO)
++ AD FS
++ Azure AD
 
 Customers using **Email Address** or **Username** authentication will receive a 403 Forbidden error. They should be using the non-SSO version of the method given in the documentation.
 
@@ -2543,7 +2548,7 @@ Returned properties are -
         
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -3112,15 +3117,16 @@ If the user has already been removed from the group (or has never been added to 
 
         User is not a member of this group
 
-## Members - AD FS Authentication [/groups/{groupReference}/users/sso]
+## Members - SSO Authentication [/groups/{groupReference}/users/sso]
 
-Manages multiple users within a group, for domains using AD FS authentication.
+Manages multiple users within a group, for domains using SSO authentication.
 
 **Who can use this endpoint?**
 
 This endpoint can only be used by customers that have Enable configured to authenticate users with:
 
-+ AD FS (SSO)
++ AD FS
++ Azure AD
 
 ### List Users In Group [GET]
 
@@ -3164,7 +3170,7 @@ If the group reference is not a valid reference, or if the group cannot be found
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -3257,7 +3263,7 @@ If a group member already exists, and no role is specified in the request, then 
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -3265,15 +3271,16 @@ If a group member already exists, and no role is specified in the request, then 
             "Cannot find group"
         ]
 
-## Member - AD FS Authentication [/groups/{groupReference}/users/sso/{id}]
+## Member - SSO Authentication [/groups/{groupReference}/users/sso/{id}]
 
-Manages a single user within a group, for domains using AD FS authentication.
+Manages a single user within a group, for domains using SSO authentication.
 
 **Who can use this endpoint?**
 
 This endpoint can only be used by customers that have Enable configured to authenticate users with:
 
-+ AD FS (SSO)
++ AD FS
++ Azure AD
 
 ### Get Group Member [GET]
 
@@ -3309,7 +3316,7 @@ If the group reference is not a valid reference, or if the group cannot be found
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -3380,7 +3387,7 @@ If the user already exists in the group, then the user's membership type will be
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -3423,7 +3430,7 @@ If the user has already been removed from the group (or has never been added to 
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404
 
@@ -3445,7 +3452,8 @@ Removes a list of sso users from a group.
 
 This endpoint can only be used by customers that have Enable configured to authenticate users with:
 
-+ AD FS (SSO)
++ AD FS
++ Azure AD
 
 Customers using **Email Address** or **Username** authentication will receive a 403 Forbidden error. They should be using the non sso version of the method given in the documentation.
 
@@ -3492,7 +3500,7 @@ The parameters are -
 
 + Response 403
 
-        This endpoint can only be used for domains configured to use AD FS
+       This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
 
 + Response 404 
 
@@ -3549,7 +3557,7 @@ The parameters are -
 
 + Response 403
 
-        This endpoint can not be used for AD FS domains
+        This endpoint cannot be used for domains configured with SSO
 
 + Response 404 
 
@@ -4316,7 +4324,7 @@ The endpoints in this section can only be used by customers that have Enable con
 
 + Username
 
-Customers using **AD FS (SSO)** authentication will receive a 403 Forbidden error.
+Customers using **AD FS/Azure AD (SSO)** authentication will receive a 403 Forbidden error.
 
 ## Purchases [/shop/purchases]
 Records a purchase of modules made by a user outside of the LMS.
