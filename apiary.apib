@@ -2724,6 +2724,9 @@ Gets a list of groups.
 
 The parameters are -
 + `search` *(optional)* A free-text search that filters the list of groups based on the name of the group (case insensitive).
++ `classifications` *(optional)* The classification details that filters the list of groups based on the group's classifications.  The classification names need to match exactly, but are case insensitive.
++ `classifications\matches` The list of classification names that need to match exactly (case insensitive).  If an empty or null array is provided then the classification filter is ignored.
++ `classifications\matchAny` *(optional, defaults to false)* Defines how multiple matches are to be made.  When true, the object is found if any of the values in the list are a match.  When false, the object is found if all values in the list are a match.
 + `pageSize` *(optional, defaults to 12)* The number of items to return for a page
 + `pageNumber` *(optional, defaults to 1)* The requested page.  This number is 1-based (such as the first page is `pageNumber: 1`)
 + `order` *(optional, defaults to AlphaAscending)* The order of the groups.  The available options are -
@@ -2756,7 +2759,12 @@ No results will return `totalGroups: 0` and an empty array.
                 "search": "Group 1", 
                 "pageSize": 24,
                 "pageNumber": 1,
-                "order": "DateDescending"
+                "order": "DateDescending",
+                "classifications":
+                {
+                    "matches": ["Classification1", "Classification2"],
+                    "matchAny": true
+                }
             }
     
 + Response 200 (application/json)
