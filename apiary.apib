@@ -4851,6 +4851,7 @@ The parameters are -
 + `userFilter\filterType` *(required)* The type of user filter.  Options are **group** to filter by groups and **classification** to filter by classifications.  Must be a **STRING**
 + `userFilter\selected` *(optional)* A list of references to filter by, depending on what type is set in userFilter\filterType (when 'group' is specified this will be a list of group references, when 'classification' is specified this will be a list of classification references).  When this list is not specified or empty, then all groups/classifications will be included (for example, will return users that exist in any group or classification).  Must be an **ARRAY** of **GUID**
 + `dataFilter` *(optional, defaults to 'all')* The filter applied to related data in the report.  Options are **all** to return all data, and **byUserFilter** to only return related data that matches the filter specified in the user filter.  For example, say a user has two allocations from two different groups and the user filter is set to return just one of these groups.  If a dataFilter of 'all' is specified then the allocations for both groups the user is a member of will be included, however if 'byUserFilter' is specified then only the allocations relating to the specified group will be included.  This should be a **STRING**
++ `selectedModules` *(optional)* A list of module references to filter by.  When this list is not specified or empty, then all modules will be included.  Must be an **ARRAY** of **GUID**
 
 Returns the reference of the created report, which is a **GUID**.  This reference is used in the endpoint to export the data.
 
@@ -4865,8 +4866,154 @@ Returns the reference of the created report, which is a **GUID**.  This referenc
     
     + Body
     
+            {name: "Report For Users"
+            }
+
++ Request Including inactive users (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+
+    + Body
+
             {
-                name: "My Report Name"
+                name: "Report For Modules",
+                includeInactiveUsers: true
+            }
+
++ Request By all groups (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+
+    + Body
+
+            {
+                name: "Report For Modules",
+                userFilter:
+                {
+                    filterType: "group"
+                }
+            }
+
++ Request By specific groups (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+
+    + Body
+
+            {
+                name: "Report For Modules",
+                userFilter:
+                {
+                    filterType: "group",
+                    selected:
+                    [
+                        "d44a802e-f6c0-4633-aebe-45ce4e270917",
+                        "7f4e5247-a5df-49c9-88fe-b33df3ced44d"
+                    ]
+                }
+            }
+
++ Request By specific groups and only include group data (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+
+    + Body
+
+            {
+                name: "Report For Modules",
+                userFilter:
+                {
+                    filterType: "group",
+                    selected:
+                    [
+                        "d44a802e-f6c0-4633-aebe-45ce4e270917",
+                        "7f4e5247-a5df-49c9-88fe-b33df3ced44d"
+                    ]
+                },
+                dataFilter: "byUserFilter"
+            }
+
++ Request By all classifications (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+
+    + Body
+
+            {
+                name: "Report For Modules",
+                userFilter:
+                {
+                    filterType: "classification"
+                }
+            }
+
++ Request By specific classifications (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+
+    + Body
+
+            {
+                name: "Report For Modules",
+                userFilter:
+                {
+                    filterType: "classification",
+                    selected:
+                    [
+                        "eafe48c8-f1b8-4668-ad07-b0afb9dd990f",
+                        "f18b1546-d222-4fe8-8382-8436882f95cb"
+                    ]
+                }
+            }
+
++ Request By specific modules (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+
+    + Body
+
+            {
+                name: "Report For Modules",
+                selectedModules:
+                [
+                    "5163b1e7-7317-4310-b976-8366f03d59dd",
+                    "8c87dc90-b427-4a80-9555-f7b54cbb7668"
+                ]
             }
 
 + Response 201 (application/json)
@@ -5037,13 +5184,34 @@ No results will return an object with an empty **rows** array.
     + Body
     
             {
-                columns: ["ModuleName"],
+                columns: ["FirstName", "LastName", "TimeTakenTotalSeconds", "ProgressPercentage", "IsComplete"],
                 filterLogicOperator: "or",
                 filters: [
                     {
-                        columnName: "ModuleName",
+                        columnName: "FirstName",
                         comparisonType: "matchesexactly",
-                        value: "Value 1"
+                        value: "Jamie"
+                    },
+                    {
+                        columnName: "LastName",
+                        comparisonType: "contains",
+                        value: "Bur"
+                    },
+                    {
+                        columnName: "TimeTakenTotalSeconds",
+                        comparisonType: "greaterThan",
+                        hours: 1,
+                        minutes: 0
+                    },
+                    {
+                        columnName: "IsComplete",
+                        value: true
+                    },
+                    {
+                        columnName: "ProgressPercentage",
+                        comparisonType: "between",
+                        from: 25,
+                        to: 50
                     }
                 ]
             }
@@ -5055,12 +5223,60 @@ No results will return an object with an empty **rows** array.
             {
               "cells": [
                 {
-                    "column": "Module Name",
-                    "columnInternalName": "ModuleName",
-                    "value": "Value 1",
-                    "cellColor": "",
-                    "textColor": "F000000",
-                    "hasCellColor": false
+                  "column": "First Name",
+                  "columnInternalName": "FirstName",
+                  "value": "Jamie",
+                  "cellColor": "",
+                  "textColor": "F000000",
+                  "hasCellColor": false
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "column": "Last Name",
+                  "columnInternalName": "LastName",
+                  "value": "Burns",
+                  "cellColor": "",
+                  "textColor": "F000000",
+                  "hasCellColor": false
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "column": "Time Taken Total Seconds",
+                  "columnInternalName": "TimeTakenTotalSeconds",
+                  "value": "9389",
+                  "cellColor": "",
+                  "textColor": "F000000",
+                  "hasCellColor": false
+                }
+              ]
+            },
+             {
+              "cells": [
+                {
+                  "column": "Progress Percent",
+                  "columnInternalName": "ProgressPercentage",
+                  "value": "100.0",
+                  "cellColor": "",
+                  "textColor": "F000000",
+                  "hasCellColor": false
+                }
+              ]
+            },
+            {
+              "cells": [
+                {
+                  "column": "Is Completed",
+                  "columnInternalName": "IsComplete",
+                  "value": "True",
+                  "cellColor": "",
+                  "textColor": "F000000",
+                  "hasCellColor": false
                 }
               ]
             }
