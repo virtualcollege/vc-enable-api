@@ -3570,7 +3570,7 @@ The parameters are -
 + `name` The name of the group to be created.
 + `abbreviatedName` *(optional)* The abbrivated name of the group to be created.
 + `classifications` *(optional)* An array of classification names to be associated with the created group. If a classification does not exist it will be created. Classifications can only be added and not removed via this call.
-+ `groupType` The visibility of the group to users within enable. The available options are -
++ `groupType` *(required)* The visibility of the group to users within enable. The available options are -
     + PrivateVisible
     + PrivateHidden
     + PublicJoinable
@@ -3579,6 +3579,23 @@ The parameters are -
 + `requiresReasonToJoin` *(defaults to false)* Determines whether uses must provide a reason to join a group when the group type is PublicJoinable.
 + `isLineManagementGroup` *(defaults to false)* Allows Line Managers to manage contained members.
 + `allowSelfRegistration` *(defaults to false)* Allows users of this group to register themselves for the LMS
++ `modules` *(optional)* The array of modules to be added to the group.  Must be an **ARRAY**
++ `modules\moduleReference` *(required)* The reference of the module.  Must be a **GUID**
++ `modules\licenceLimit` *(optional, defaults to unlimited)*. The maximum number of licences that can be used for this module. Only applicable to licensed modules, and for group allocations - for non-licensed or non-group allocations this property is ignored
++ `modules\isPosted` *(optional, defaults to false)*. Whether the module is the posted certificate version
++ `modules\allocationMethod` *(required)* The type of allocation. Valid values are -
+    + Manual
+    + Automatic
+    + UserSelfEnrol
++ `modules\sendEmailOnAllocation` *(optional, defaults to false)*. Whether emails are sent to the user when the allocation is made. This is only applicable to Manual and Automatic allocation types - it will be ignored for UserSelfEnrol types
++ `modules\startDate` *(optional, defaults to now)*. The date when the allocation is to be made available to the user. Must be in UTC, according to ISO 8601
++ `modules\onlyAssessmentsMandatory` *(optional, defaults to false)*. Whether only the assessments within the allocation need to be completed for the entire allocation to be marked as complete
++ `modules\automaticSettings` *(optional)* The settings for the automatic allocation.  This is only used when the allocationMethod is set to Automatic
++ `modules\automaticSettings\giveAgainNotStarted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that hasn't been started should be allocated another module
++ `modules\automaticSettings\giveAgainInProgress` *(optional, defaults to false)*. Defines whether users that have a existing allocation that is in progress should be allocated another module
++ `modules\automaticSettings\giveAgainCompleted` *(optional, defaults to false)*. Defines whether users that have a existing allocation that has been completed should be allocated another module
++ `modules\selfEnrolSettings` *(optional)* The settings for the self-enrol allocation.  This is only used when the allocationMethod is set to UserSelfEnrol
++ `modules\selfEnrolSettings\requiresApproval` *(optional, defaults to false)*. Defines whether users require approval before self-enrolling onto the module
 
 A successful request will return a success message alongside the generated group id (GUID).
 
