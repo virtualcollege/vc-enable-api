@@ -746,6 +746,138 @@ The parameters are -
 
 + Response 404
 
+## Line Managers [/users/{userIdentifier}/LineManagers]
+
+Get line managers for a given user.
+
+### Line Managers [POST]
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
++ `userLineManagerRequestModel` *(required)* An object with obtions to filter line managers
+
+ Returns a list filtered with the options sent in the object model.
+ By Default IncludeInactive is set to false and IncludeIndirect is set to true.
+ 
+ If there are no line managers a empty list will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                "userLineManagerRequestModel": 
+                {
+                    "IncludeInactive": false,
+                    "IncludeIndirect": true
+                }
+            }
+            
++ Response 200
+
+        [
+            {
+                "userId" : 1234,
+                "reference" : "e3a637bd-6903-40a5-a89f-3a7fab6580d6",
+                "level": 1,
+                "createdDate": "2021-11-02T08:35:34.4"
+            },
+            {
+                "userId" : 4321,
+                "reference" : "4802c09f-2140-447b-83f1-42126bd3a030",
+                "level": 2,
+                "createdDate": "2022-11-02T08:35:34.4"
+            }
+        ]
+
++ Response 400
+        
+        [
+            "Cannot find user with username1"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+## Staff [/users/{userIdentifier}/Staff]
+
+Get Staff for a given user.
+
+### Staff [POST]
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
++ `userStaffRequestModel` *(required)* An object with obtions to filter staff members
+
+ Returns a list filtered with the options sent in the object model.
+ By Default IncludeInactive is set to false and IncludeIndirect is set to true and IncludeAssignedByGroup is set to true and IncludeAssignedByIndividual is set to true.
+ 
+ If there are no line managers a empty list will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                "userStaffRequestModel": 
+                {
+                    "IncludeInactive": false,
+                    "IncludeIndirect": true,
+                    "IncludeAssignedByGroup": true,
+                    "IncludeAssignedByIndividual": true,
+                }
+            }
+            
++ Response 200
+
+        [
+            {
+                "userId" : 1234,
+                "reference" : "e3a637bd-6903-40a5-a89f-3a7fab6580d6",
+                "level": 1,
+                "createdDate": "2021-11-02T08:35:34.4"
+            },
+            {
+                "userId" : 4321,
+                "reference" : "4802c09f-2140-447b-83f1-42126bd3a030",
+                "level": 2,
+                "createdDate": "2022-11-02T08:35:34.4"
+            }
+        ]
+
++ Response 400
+        
+        [
+            "Cannot find user with username1"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
 ## Groups [/users/{userIdentifier}/groups]
 
 Manages multiple groups for a user.
