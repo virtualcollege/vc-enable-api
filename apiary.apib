@@ -911,10 +911,14 @@ The parameters are -
             [
                 {
                     groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+                    groupName: "Group1",
+                    GroupAbbreviatedName: "Abbreviated Name 1",
                     role: "admin"
                 },
                 {
                     groupReference: "55e19dcf-751c-423a-9781-1ab72d9083d3",
+                    groupName: "Group2",
+                    GroupAbbreviatedName: "Abbreviated Name 2",
                     role: "user"
                 }
             ]
@@ -1060,6 +1064,8 @@ If the group reference is not a valid reference, or if the group cannot be found
 
         {
             groupReference: "718a78cb-8b57-47ee-abd1-a1a9ee15a45b",
+            groupName: "Group1",
+            GroupAbbreviatedName: "Abbreviated Name 1",
             role: "admin"
         }
 
@@ -2860,7 +2866,7 @@ Gets a list of groups.
 ### Search [POST]
 
 The parameters are -
-+ `search` *(optional)* A free-text search that filters the list of groups based on the name of the group (case insensitive).
++ `search` *(optional)* A free-text search that filters the list of groups based on the name of the group or abbreviated group name (case insensitive).
 + `classifications` *(optional)* The classification details that filters the list of groups based on the group's classifications.  The classification names need to match exactly, but are case insensitive.
 + `classifications\matches` The list of classification names that need to match exactly (case insensitive).  If an empty or null array is provided then the classification filter is ignored.
 + `classifications\matchAny` *(optional, defaults to false)* Defines how multiple matches are to be made.  When true, the object is found if any of the values in the list are a match.  When false, the object is found if all values in the list are a match.
@@ -2878,6 +2884,7 @@ Returned properties are -
 + `groups\reference` The reference of the group within an LMS.  This is a **GUID**
 + `groups\name` This is the name of the group
 + `groups\classifications` This is the comma separated classification names
++ `groups\abbreviated name` This is the abbreviated name of the group
 
 No results will return `totalGroups: 0` and an empty array.
 
@@ -3756,7 +3763,7 @@ A successful request will return a success message alongside the generated group
 + Response 200 (application/json)
 
         [
-            "Created new group with reference: 9750ff9f-1c26-4d7c-b836-79f084d706dd"
+            "Created new group: Reference: 9750ff9f-1c26-4d7c-b836-79f084d706dd, Name: Group Name, Abbreviated Name: Abbreviated Group Name"
         ]
 
 + Response 401
@@ -3827,7 +3834,7 @@ A successful request will return a success message alongside the updated group i
 + Response 200 (application/json)
 
         [
-            "Successfully updated group with reference: 9750ff9f-1c26-4d7c-b836-79f084d706dd"
+            "Successfully updated group. Reference: 9750ff9f-1c26-4d7c-b836-79f084d706dd, Name: Group Name, Abbreviated Name: Abbreviated Group Name"
         ]
 
 + Response 401
