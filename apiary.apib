@@ -320,7 +320,6 @@ Creates a new user
 The parameters are -
 + `emailAddress` *(required)* The user's email address. Maximum 100 characters, and must be of a valid email address format. Email address must be unique.
 + `userName` *(required for domain using user name to identify the user)* The user's user name. Maximum 100 characters. User name must be unique. 
-+ `providerUserKey` *(optional)* The unique identifier for the user.  This is for **SSO** users only
 + `firstName` *(required)* The user's first name. Maximum 255 characters
 + `lastName` *(required)* This user's last name. Maximum 255 characters
 + `additional` *(required for mandatory fields and optional otherwise)* An array of name value pairs for optional fields
@@ -431,7 +430,6 @@ When updating, only the following properties can be changed -
 + `lastName` *(required)* This can be freely changed. Maximum 255 characters
 + `emailAddress` *(required)* This can only be changed if the user with the same email address does not exist in other LMSs. Maximum 100 characters.  Email address must be unique.
 + `userName` *(required for domains using user name to identify the user)* This can only be changed if the user with the same user name does not exist in current LMSs. Maximum 100 characters. User name must be unique. 
-+ `providerUserKey` *(optional)* The unique identifier for the user.  This is for **SSO** users only
 + `additional` *(required for missing mandatory fields and optional otherwise)* An array of optional fields.  If a mandatory field does not already exists for the user and not providing it while updating, will throw an error. Other fields not provided in the list will remain unchanged when persisted
 + `additional\name` *(required)* The name of the property, in English
 + `additional\value` *(optional)* The value of the property.  The type will be dependent on the type of the field itself
@@ -443,7 +441,6 @@ When patching, only the following properties can be changed -
 + `lastName` *(optional)* This can be freely changed. Maximum 255 characters
 + `emailAddress` *(optional)* This can only be changed if the user with the same email address does not exist in other LMSs. Maximum 100 characters
 + `userName` *(optional)* This can only be changed if the user with the same user name does not exist in current LMSs. Maximum 100 characters
-+ `providerUserKey` *(optional)* This can be freely changed
 
 ### Find [GET]
 
