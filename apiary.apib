@@ -746,11 +746,65 @@ The parameters are -
 
 + Response 404
 
-## Line Managers [/users/{userIdentifier}/LineManagers]
+## Line Managers [/users/{userIdentifier}/LineManagers?includeInactive={false}&includeIndirect={true}]
 
 Get line managers for a given user.
 
-### Line Managers [POST]
+### Line Managers [GET]
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
++ `includeInactive` *(optional)* Whether inactive staff are included. Defaults to false.
++ `includeIndirect` *(optional)* Whether indirect staff are included. Defaults to true.
+
+ Returns a list filtered with the options provided.
+ 
+ Returned properties are -
++ `reference` The reference of the manager.  This is a **GUID**
++ `level` The level of the manager, starting from **1** for a direct manager.  This is an **INT**
++ `createdDate` This is the date the manager was assigned to the user.  This date is **UTC**, according to **ISO 8601**.
+
+ If there are no line managers an empty list will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200
+
+        [
+            {
+                "reference" : "e3a637bd-6903-40a5-a89f-3a7fab6580d6",
+                "level": 1,
+                "createdDate": "2021-11-02T08:35:34.4"
+            },
+            {
+                "reference" : "4802c09f-2140-447b-83f1-42126bd3a030",
+                "level": 2,
+                "createdDate": "2022-11-02T08:35:34.4"
+            }
+        ]
+
++ Response 400
+        
+        [
+            "User for identifier 'example@email.com' could not be found."
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+### Line Managers (deprecated) [POST]
 
 The parameters are -
 + `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
@@ -808,11 +862,67 @@ The parameters are -
 
 + Response 404
 
-## Staff [/users/{userIdentifier}/Staff]
+## Staff [/users/{userIdentifier}/Staff?includeInactive={false}&includeIndirect={true}&includeAssignedByGroup={true}&includeAssignedByIndividual={true}]
 
-Get Staff for a given user.
+Get staff for a given user.
 
-### Staff [POST]
+### Staff [GET]
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
++ `includeInactive` *(optional)* Whether inactive staff are included. Defaults to false.
++ `includeIndirect` *(optional)* Whether indirect staff are included. Defaults to true.
++ `includeAssignedByGroup` *(optional)* Whether staff assigned via groups are included. Defaults to true.
++ `includeAssignedByIndividual` *(optional)* Whether staff assigned individually are included. Defaults to true.
+
+ Returns a list filtered with the options provided.
+ 
+ Returned properties are -
++ `reference` The reference of the staff member.  This is a **GUID**
++ `level` The level of the staff, starting from **1** for a direct staff member.  This is an **INT**
++ `createdDate` This is the date the staff member was assigned to the user.  This date is **UTC**, according to **ISO 8601**.
+
+ If there is no staff an empty list will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200
+
+        [
+            {
+                "reference" : "e3a637bd-6903-40a5-a89f-3a7fab6580d6",
+                "level": 1,
+                "createdDate": "2021-11-02T08:35:34.4"
+            },
+            {
+                "reference" : "4802c09f-2140-447b-83f1-42126bd3a030",
+                "level": 2,
+                "createdDate": "2022-11-02T08:35:34.4"
+            }
+        ]
+
++ Response 400
+        
+        [
+            "User for identifier 'example@email.com' could not be found."
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint cannot be used for domains configured with SSO
+
++ Response 404
+
+### Staff (deprecated) [POST]
 
 The parameters are -
 + `userIdentifier` *(required)* The exact email address (for domains using email to identify users) or user name (for domains using user name to identify users).
@@ -2045,6 +2155,124 @@ The parameters are -
         
         [
             "Cannot find user: S-1-5-21-2527162006-4105834857-2401098550-2613"
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
+
++ Response 404
+
+## Line Managers [/users/sso/{id}/LineManagers?includeInactive={false}&includeIndirect={true}]
+
+Get line managers for a given user.
+
+### Line Managers [GET]
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
++ `includeInactive` *(optional)* Whether inactive staff are included. Defaults to false.
++ `includeIndirect` *(optional)* Whether indirect staff are included. Defaults to true.
+
+ Returns a list filtered with the options provided.
+ 
+ Returned properties are -
++ `reference` The reference of the manager.  This is a **GUID**
++ `level` The level of the manager, starting from **1** for a direct manager.  This is an **INT**
++ `createdDate` This is the date the manager was assigned to the user.  This date is **UTC**, according to **ISO 8601**.
+
+ If there are no line managers an empty list will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200
+
+        [
+            {
+                "reference" : "e3a637bd-6903-40a5-a89f-3a7fab6580d6",
+                "level": 1,
+                "createdDate": "2021-11-02T08:35:34.4"
+            },
+            {
+                "reference" : "4802c09f-2140-447b-83f1-42126bd3a030",
+                "level": 2,
+                "createdDate": "2022-11-02T08:35:34.4"
+            }
+        ]
+
++ Response 400
+        
+        [
+            "User for identifier 'user123' could not be found."
+        ]
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
+
++ Response 404
+
+## Staff [/users/sso/{id}/Staff?includeInactive={false}&includeIndirect={true}&includeAssignedByGroup={true}&includeAssignedByIndividual={true}]
+
+Get staff for a given user.
+
+### Staff [GET]
+
+The parameters are -
++ `id` *(required)* The id of the user. For AD FS SSO, this should be the SID.  For Azure AD, this should be the object ID (oid).
++ `includeInactive` *(optional)* Whether inactive staff are included. Defaults to false.
++ `includeIndirect` *(optional)* Whether indirect staff are included. Defaults to true.
++ `includeAssignedByGroup` *(optional)* Whether staff assigned via groups are included. Defaults to true.
++ `includeAssignedByIndividual` *(optional)* Whether staff assigned individually are included. Defaults to true.
+
+ Returns a list filtered with the options provided.
+ 
+ Returned properties are -
++ `reference` The reference of the staff member.  This is a **GUID**
++ `level` The level of the staff, starting from **1** for a direct staff member.  This is an **INT**
++ `createdDate` This is the date the staff member was assigned to the user.  This date is **UTC**, according to **ISO 8601**.
+
+ If there is no staff an empty list will be returned.
+ 
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+            
++ Response 200
+
+        [
+            {
+                "reference" : "e3a637bd-6903-40a5-a89f-3a7fab6580d6",
+                "level": 1,
+                "createdDate": "2021-11-02T08:35:34.4"
+            },
+            {
+                "reference" : "4802c09f-2140-447b-83f1-42126bd3a030",
+                "level": 2,
+                "createdDate": "2022-11-02T08:35:34.4"
+            }
+        ]
+
++ Response 400
+        
+        [
+            "User for identifier 'user123' could not be found."
         ]
 
 + Response 401
