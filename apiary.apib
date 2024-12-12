@@ -1496,6 +1496,91 @@ If a user is not found for a specific id, then an error will be returned includi
 
 + Response 404
 
+## User SSO Details [/users/{userIdentifier}/SSO]
+Views and edits the SSO details of a user, identified by the user's email address.
+
+The parameters are -
++ `userIdentifier` *(required)* The exact email address.  This is a **STRING**
+
+The SSO properties are -
++ `id` The id of the user. For AD FS SSO, this should be the SID. For Azure AD, this should be the object ID (oid).  This is a **STRING**
+
+### Get User SSO Details [GET]
+
+Gets the SSO detail of the user.
+
+If no user is found with the specified email address, then a 404 Not Found error will be returned.
+
+If multiple users are found with the specified email address, then a 404 Not Found error will be returned.
+
++ Request (application/json)
+
+    + Header
+    
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+            
++ Response 200 (application/json)
+
+        {
+            "id": "SSO-ID-1234"
+        }
+
++ Response 400
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
+
++ Response 404
+
+### Update User SSO Details [PATCH]
+
+Updates the SSO details of the user.
+
+If no user is found with the specified email address, then a 404 Not Found error will be returned.
+
+If multiple users are found with the specified email address, then a 404 Not Found error will be returned.
+
+If the update is successful, then the updated SSO details are returned.
+
++ Request (application/json)
+
+    + Header
+    
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB
+    
+    + Body
+    
+            {
+                "id": "SSO-ID-1234-UPDATED"
+            }
+            
++ Response 200 (application/json)
+
+            {
+                "id": "SSO-ID-1234-UPDATED"
+            }
+
++ Response 400
+
++ Response 401
+
++ Response 403
+
+        This endpoint can only be used for domains configured to use SSO (AD FS or Azure AD/OAuth)
+
++ Response 404
+
 ## Delete Users [/users/SSO/delete]
 Deletes SSO users from the LMS.
 
