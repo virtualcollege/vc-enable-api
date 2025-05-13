@@ -2372,6 +2372,51 @@ No results will return `totalModules: 0` and an empty array.
 
 + Response 404
 
+## Module [/learn/modules/{moduleReference}]
+
+Gets the details of a single module
+
+### Get Module Details [GET]
+
+The parameters for this are -
++ `moduleReference` The reference of the module
+
+The returned properties are -
++ `moduleReference` The reference of the module.  This is the reference that should be used when informing the LMS of any purchases.  This is a **GUID**
++ `name` This is the name of the module, in English
++ `description` This is the description of the module, in English
++ `publishDate` This is the date and time at which the module was last published.  This date is **UTC**, according to **ISO 8601**.
++ `isPosted` This is whether the module can have a posted certificate.  Where an LMS is licenced a posted and non-posted version of the module, this will be set as true.  This is a **BOOL**
+
++ Request (application/json)
+
+    + Header
+
+            x-api-version: 1.0
+            x-api-nonce: 2147483647
+            x-api-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyMzQ1Njc4OTAsIm5hbWUiOiJKb2huIERvZSIsImFkbWluIjp0cnVlfQ.eoaDVGTClRdfxUZXiPs3f8FmJDkDE_VCQFXqKxpLsts
+            x-api-language: en-GB 
+
++ Response 200 (application/json)
+            
+        {
+          "moduleReference": "e95b38d1-6042-4f29-807c-aa950509655c",
+          "name": "Group Name 1",
+          "description": "Group Description 1",
+          "publishDate": "2024-04-23T18:25:43.511Z",
+          "isPosted": true
+        }
+
++ Response 400
+
+        Module reference is not a valid reference
+        
++ Response 401
+
++ Response 404
+
+        Cannot find module
+
 ## User Has Allocation [/learn/modules/userHasAllocation]
 Check if the user has the module allocated.
 
